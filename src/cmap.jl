@@ -70,8 +70,8 @@ hue are relatively unimportant.
 
 ```
 Usage:  1:  (map, name, desc) = cmap(I, keyword_params ...)
-        3:  cmap()
         2:  cmap(searchStr)
+        3:  cmap()
 
 Arguments for Usage 1:
 
@@ -83,7 +83,7 @@ Arguments for Usage 1:
   labels:  "L1" - "L15"  for linear maps
            "D1" - "D12"  for diverging maps
            "C1" - "C9"   for cyclic maps
-           "R1" - "R2"   for rainbow maps
+           "R1" - "R3"   for rainbow maps
            "I1" - "I3"   for isoluminant maps
 
  Some colour maps have alternate labels for convenience and readability.
@@ -112,8 +112,8 @@ Returns:
           map - Array of ColorTypes.RGB{Float64,1} giving the rgb colour map
          name - A string giving a nominal name for the colour map
          desc - A string giving a brief description of the colour map
-
 ```
+
 Usage 2 and 3:  cmap(searchStr)
 
 Given the large number of colour maps that this function can create this usage
@@ -131,6 +131,7 @@ Note the listing of colour maps can be a bit slow because each colour map has to
 be created in order to determine its full name.
 
 **Using the colour maps:**
+
 ```
 > Using PyPlot
 > sr = sineramp();    # Generate the sineramp() colour map test image.
@@ -153,9 +154,11 @@ constructor
 You can also apply a colour map to a single channel image to create a
 conventional RGB image. This is recommended if you are using a
 diverging or cyclic colour map because it allows you to ensure data
-values are honoured when you map them to colours.
+values are honoured appropriately when you map them to colours.
+
 ```
-> rgbimg = applycolourmap(sr, cmap("H4")[1]);
+  Apply the L4 heat colour map to the test image 
+> rgbimg = applycolourmap(sr, cmap("L4")[1]);
 
   Apply a diverging colour map to the test image using 127 as the
   value that is associated with the centre point of the diverging
@@ -176,6 +179,7 @@ to take care which image display functions you choose to use.
 
 
 **Colour Map naming convention:**
+
 ```
                     linear_kryw_5-100_c67_n256
                       /      /    |    \    \
@@ -208,7 +212,8 @@ colour map). For cyclic and rainbow colour maps the two values indicate the
 minimum and maximum lightness values. Isoluminant colour maps have only
 one lightness value. 
 
-* The string of characters indicating the nominal hue sequence uses the following code
+* The string of characters indicating the nominal hue sequence uses
+the following code
 
 ```
       r - red      g - green      b - blue
@@ -1574,8 +1579,12 @@ end
 
 #-------------------------------------------------------------------------------
 """
-equalisecolourmap - Equalise colour contrast over a colour map
-equalizecolormap
+equalisecolourmap/equalizecolormap - Equalise colour contrast over a colour map
+
+This function is used by cmap() and you would not normally call this
+function directly. However, you may want to try using this function to
+equalise the perceptual contrast of colour maps obtained from some
+other source.
 
 ```
 Usage: newrgbmap = equalisecolourmap(rgblab, map, formula, W, sigma, diagnostics)
@@ -1590,7 +1599,7 @@ Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
                         lightness, chroma and hue components of the
                         difference equation. It is recommended that you 
                         use [1, 0, 0] to only take into account lightness.
-                        If desired used  [1, 1, 1] for the full formula.
+                        If desired use  [1, 1, 1] for the full formula.
                         See note below.
                 sigma - Optional Gaussian smoothing parameter, see
                         explanation below.
@@ -2035,11 +2044,11 @@ used to convert a 3 channel RGB image to a 3 channel CIELAB image
 
 Note it appears that the Colors.convert() function uses a default white
 point of D65
+
 ```
  Usage:  lab = srgb2lab(rgb)
 
  Argument:    rgb - A N x 3 array of RGB values or a 3 channel RGB image.
-
  Returns:     lab - A N x 3 array of Lab values of a 3 channel CIELAB image.
 
 ```
@@ -2084,18 +2093,18 @@ function srgb2lab{T}(rgb::Array{T,3})
 end
 
 #----------------------------------------------------------------------------
-"""
+""" 
 Convenience function for converting an Nx3 array of CIELAB values in a
 colour map to an Nx3 array of RGB values.  Function can also be
 used to convert a 3 channel CIELAB image to a 3 channel RGB image
 
 Note it appears that the Colors.convert() function uses a default white
 point of D65
+
 ```
  Usage:  rgb = srgb2lab(lab)
 
  Argument:   lab - A N x 3 array of CIELAB values of a 3 channel CIELAB image.
-
  Returns:    rgb - A N x 3 array of RGB values or a 3 channel RGB image.
 ```
 See also: srgb2lab
@@ -2185,11 +2194,10 @@ function convert(::Type{UInt32}, rgb::Array{ColorTypes.RGB{Float64},1})
     return uint32rgb
 end
 
-
-
 #----------------------------------------------------------------------------
 """
 linearrgbmap: Linear rgb colourmap from black to a specified colour
+
 ```
 Usage: cmap = linearrgbmap(C, N)
 
@@ -2202,8 +2210,9 @@ Returns: cmap - N element ColorTypes.RGB colourmap ranging from [0 0 0]
 It is suggested that you pass the resulting colour map to equalisecolourmap()
 to obtain a map with uniform steps in perceptual lightness
 
+```
 > cmap = equalisecolourmap("rgb", linearrgbmap(C, N))
-
+```
 See also: equalisecolourmap, ternarymaps
 """
 function linearrgbmap(C::Array, N::Int = 256)

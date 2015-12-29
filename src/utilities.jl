@@ -383,12 +383,14 @@ end
 
 #----------------------------------------------------------------------
 """
-normalise - Normalises image values to 0-1, or to desired mean and variance
+normalise/normalize - Normalises image values to 0-1, or to desired mean and variance
+
 ```
 Usage 1:      nimg = normalise(img)
 ```
 Offsets and rescales image so that the minimum value is 0
 and the maximum value is 1.  
+
 ```
 Usage 2:      nimg = normalise(img, reqmean, reqvar)
 
@@ -452,6 +454,7 @@ the primary part of the histogram.  This solves the problem
 when one has, say, a few very bright values in the image which
 have the overall effect of darkening the rest of the image after
 rescaling.
+
 ```
 Usage: 
 1)   newimg = histtruncate(img, lHistCut, uHistCut)
@@ -536,6 +539,7 @@ should not see any identifiable features as the underlying signal is a smooth
 ramp.  In practice many colour maps have uneven perceptual contrast over their
 range and often include 'flat spots' of no perceptual contrast that can hide
 significant features.
+
 ```
 Usage: img = sineramp(sze, amp, wavelen, p)
        img = sineramp()
@@ -559,10 +563,12 @@ top of the test image being reduced relative to the slope of the ramp at
 the bottom of the image.
 
 To start with try
+
 ```
   > img = sineramp()
 ```
 This is equivalent to 
+
 ```
   > img = sineramp((256 512), 12.5, 8, 2)
 ```
@@ -641,7 +647,8 @@ end
 
 #----------------------------------------------------------------------
 """           
-circlesineramp - Generates test image for evaluating cyclic colour maps
+circlesineramp - Generates a test image for evaluating cyclic colour maps
+
 ```
 Usage: (img, alpha) = circlesineramp(sze, amp, wavelen, p, hole)
        (img, alpha) = circlesineramp()
@@ -696,7 +703,7 @@ are respected so that data values are correctly assigned to specific entries
 in a cyclic colour map.  The assignment of values to colours also depends on
 whether the data is cyclic over pi, or 2*pi.  SHOWANGULARIM supports this.
 
-See also: showangularim, sineramp, chirplin, chirpexp, equalisecolourmap, cmap
+See also: applycycliccolourmap, sineramp, chirplin, chirpexp, equalisecolourmap, cmap
 """
 # September 2014  Original version.
 # October   2014  Number of cycles calculated from wave length rather than
