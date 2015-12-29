@@ -3,9 +3,9 @@ Function Reference
 
 ## Index
 
-* cmap - Library of perceptually uniform colour maps.
-* equalisecolourmap/equalizecolormap - Equalise colour contrast over a colour map.
-* viewlabspace - Visualisation of Lab colour space.
+* [cmap](#cmap) - Library of perceptually uniform colour maps.
+* [equalisecolourmap/equalizecolormap](equalisecolourmap/equalizecolormap) - Equalise colour contrast over a colour map.
+* [viewlabspace](viewlabspace) - Visualisation of Lab colour space.
 * srgb2lab - Convert RGB colour map or RGB image to Lab.
 * lab2srgb - Convert Lab colour map or Lab image to RGB.
 * linearrgbmap - Linear rgb colourmap from black to a specified colour.
