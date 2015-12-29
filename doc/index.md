@@ -4,19 +4,19 @@ Function Reference
 ## Index
 
 * [cmap](#cmap) - Library of perceptually uniform colour maps.
-* [equalisecolourmap/equalizecolormap](#equalisecolourmap/equalizecolormap) - Equalise colour contrast over a colour map.
+* [equalisecolourmap/equalizecolormap](#equalisecolourmapequalizecolormap) - Equalise colour contrast over a colour map.
 * [viewlabspace](#viewlabspace) - Visualisation of Lab colour space.
 * [srgb2lab](#srgb2lab) - Convert RGB colour map or RGB image to Lab.
 * [lab2srgb](#lab2srgb) - Convert Lab colour map or Lab image to RGB.
 * [linearrgbmap](#linearrgbmap) - Linear rgb colourmap from black to a specified colour.
-* [applycolourmap/applycolormap](#applycolourmap/applycolormap) - Applies colourmap to a single channel image to obtain an RGB result.
-* [applycycliccolourmap/applycycliccolormap](#applycycliccolourmap/applycycliccolormap) - Applies a cyclic colour map to an image of angular data.
-* [applydivergingcolourmap/applydivergingcolormap](#applydivergingcolourmap/applydivergingcolormap) - Applies a diverging colour map to an image.
+* [applycolourmap/applycolormap](#applycolourmapapplycolormap) - Applies colourmap to a single channel image to obtain an RGB result.
+* [applycycliccolourmap/applycycliccolormap](#applycycliccolourmapapplycycliccolormap) - Applies a cyclic colour map to an image of angular data.
+* [applydivergingcolourmap/applydivergingcolormap](#applydivergingcolourmapapplydivergingcolormap) - Applies a diverging colour map to an image.
 * [ternaryimage](#ternaryimage) - Perceptualy uniform ternary image from 3 bands of data.
 * [sineramp](#sineramp) - Generates sine on a ramp colour map test image.
 * [circlesineramp](#circlesineramp) - Generates a test image for evaluating cyclic colour maps.
 * [histtruncate](#histtruncate) - Truncates ends of an image histogram.
-* [normalise/normalize](#normalise/normalize) - Normalises image values to 0-1, or to desired mean and variance.
+* [normalise/normalize](#normalisenormalize) - Normalises image values to 0-1, or to desired mean and variance.
 
 ## cmap
 
