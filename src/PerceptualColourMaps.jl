@@ -36,6 +36,7 @@ module PerceptualColourMaps
 include("cmap.jl")
 include("applycolourmaps.jl")
 include("viewlabspace.jl")
+include("relief.jl")
 include("utilities.jl")
 
 end  # module

@@ -3,6 +3,14 @@ PerceptualColourMaps
 
 [![Build Status](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl.svg?branch=master)](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl)
 
+![banner image](doc/banner.png)
+
+## Installation
+
+```
+> Pkg.clone("https://github.com/peterkovesi/PerceptualColourMaps.jl.git")
+```
+
 ## Summary
 
 The Perceptual Colour Maps package provides functions for creating
@@ -82,7 +90,7 @@ Arguments for Usage 1:
                     as designed. However, depending on your application you may
                     want a colour map with reduced chroma/saturation values.
                     You can use values greater than 1 however gamut clipping is
-                    likely to occur giving rise to artifacts in the colour map. 
+                    likely to occur giving rise to artifacts in the colour map.
            N::Int - Number of values in the colour map. Defaults to 256.
       shift::Real - Fraction of the colour map length N that the colour map is
                     to be cyclically rotated, may be negative.  (Should only be
@@ -128,7 +136,7 @@ constructor
 
 ```
 > Using Winston
-> colormap(cmap("R1")[1]); # Set Winston's colour map to the cmap() rainbow 
+> colormap(cmap("R1")[1]); # Set Winston's colour map to the cmap() rainbow
                            # colour map first.
 > imagesc(sr);             # Then display the image
 
@@ -140,7 +148,7 @@ diverging or cyclic colour map because it allows you to ensure data
 values are honoured appropriately when you map them to colours.
 
 ```
-  Apply the L4 heat colour map to the test image 
+  Apply the L4 heat colour map to the test image
 > rgbimg = applycolourmap(sr, cmap("L4")[1]);
 
   Apply a diverging colour map to the test image using 127 as the
@@ -148,7 +156,7 @@ values are honoured appropriately when you map them to colours.
   colour map
 > rgbimg = applydivergingcolourmap(sr, cmap("D1")[1],127);
 
-  Apply a cyclic colour map to the circlesineramp() test image specifying 
+  Apply a cyclic colour map to the circlesineramp() test image specifying
   a data cyclelength of 2*pi.
 > (cr,) = circlesineramp();   # Generate a cyclic colour map test image.
 > rgbimg = applycycliccolourmap(cr, cmap("C1")[1], cyclelength=2*pi);
@@ -216,7 +224,7 @@ relief shading. On their own these colour maps are not very useful
 because features in the data are very hard to discern. However, when
 used in conjunction with relief shading their constant lightness means
 that the colour map does not induce an independent shading pattern
-that will interfere with, or even hide, the structures induced by the
+that can interfere with, or even hide, the structures induced by the
 relief shading. The relief shading provides the structural information
 and the colours provide the data classification information.
 

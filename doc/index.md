@@ -5,18 +5,22 @@ Function Reference
 
 * [cmap](#cmap) - Library of perceptually uniform colour maps.
 * [equalisecolourmap/equalizecolormap](#equalisecolourmapequalizecolormap) - Equalise colour contrast over a colour map.
-* [viewlabspace](#viewlabspace) - Visualisation of Lab colour space.
-* [srgb2lab](#srgb2lab) - Convert RGB colour map or RGB image to Lab.
-* [lab2srgb](#lab2srgb) - Convert Lab colour map or Lab image to RGB.
 * [linearrgbmap](#linearrgbmap) - Linear rgb colourmap from black to a specified colour.
 * [applycolourmap/applycolormap](#applycolourmapapplycolormap) - Applies colourmap to a single channel image to obtain an RGB result.
 * [applycycliccolourmap/applycycliccolormap](#applycycliccolourmapapplycycliccolormap) - Applies a cyclic colour map to an image of angular data.
 * [applydivergingcolourmap/applydivergingcolormap](#applydivergingcolourmapapplydivergingcolormap) - Applies a diverging colour map to an image.
 * [ternaryimage](#ternaryimage) - Perceptualy uniform ternary image from 3 bands of data.
+* [relief](#relief) - Generates a relief shaded image.
+* [viewlabspace](#viewlabspace) - Visualisation of Lab colour space.
 * [sineramp](#sineramp) - Generates sine on a ramp colour map test image.
 * [circlesineramp](#circlesineramp) - Generates a test image for evaluating cyclic colour maps.
 * [histtruncate](#histtruncate) - Truncates ends of an image histogram.
 * [normalise/normalize](#normalisenormalize) - Normalises image values to 0-1, or to desired mean and variance.
+* [srgb2lab](#srgb2lab) - Convert RGB colour map or RGB image to Lab.
+* [lab2srgb](#lab2srgb) - Convert Lab colour map or Lab image to RGB.
+* [convert](#convert) - Conversions provided by this package.
+
+____
 
 ## cmap
 
@@ -57,7 +61,7 @@ Arguments for Usage 1:
                     as designed. However, depending on your application you may
                     want a colour map with reduced chroma/saturation values.
                     You can use values greater than 1 however gamut clipping is
-                    likely to occur giving rise to artifacts in the colour map. 
+                    likely to occur giving rise to artifacts in the colour map.
            N::Int - Number of values in the colour map. Defaults to 256.
       shift::Real - Fraction of the colour map length N that the colour map is
                     to be cyclically rotated, may be negative.  (Should only be
@@ -103,7 +107,7 @@ constructor
 
 ```
 > Using Winston
-> colormap(cmap("R1")[1]); # Set Winston's colour map to the cmap() rainbow 
+> colormap(cmap("R1")[1]); # Set Winston's colour map to the cmap() rainbow
                            # colour map first.
 > imagesc(sr);             # Then display the image
 
@@ -115,7 +119,7 @@ diverging or cyclic colour map because it allows you to ensure data
 values are honoured appropriately when you map them to colours.
 
 ```
-  Apply the L4 heat colour map to the test image 
+  Apply the L4 heat colour map to the test image
 > rgbimg = applycolourmap(sr, cmap("L4")[1]);
 
   Apply a diverging colour map to the test image using 127 as the
@@ -123,7 +127,7 @@ values are honoured appropriately when you map them to colours.
   colour map
 > rgbimg = applydivergingcolourmap(sr, cmap("D1")[1],127);
 
-  Apply a cyclic colour map to the circlesineramp() test image specifying 
+  Apply a cyclic colour map to the circlesineramp() test image specifying
   a data cyclelength of 2*pi.
 > (cr,) = circlesineramp();   # Generate a cyclic colour map test image.
 > rgbimg = applycycliccolourmap(cr, cmap("C1")[1], cyclelength=2*pi);
@@ -148,13 +152,13 @@ to take care which image display functions you choose to use.
                               Range of lightness values
 ```
 In addition, the name of the colour map may have cyclic shift information
-appended to it, it may also have a flag indicating it is reversed. 
+appended to it, it may also have a flag indicating it is reversed.
 
 ```                                              
               cyclic_wrwbw_90-40_c42_n256_s25_r
                                           /    \
                                          /   Indicates that the map is reversed.
-                                        / 
+                                        /
                   Percentage of colour map length
                   that the map has been rotated by.
 ```
@@ -168,14 +172,14 @@ map. For diverging colour maps the second value indicates the lightness value
 of the centre point of the colour map (unless it is a diverging-linear
 colour map). For cyclic and rainbow colour maps the two values indicate the
 minimum and maximum lightness values. Isoluminant colour maps have only
-one lightness value. 
+one lightness value.
 
 * The string of characters indicating the nominal hue sequence uses the following code
 
 ```
       r - red      g - green      b - blue
       c - cyan     m - magenta    y - yellow
-      o - orange   v - violet 
+      o - orange   v - violet
       k - black    w - white      j - grey
 ```
 ('j' rhymes with grey). Thus a 'heat' style colour map would be indicated by
@@ -183,7 +187,7 @@ the string 'kryw'. If the colour map is predominantly one colour then the
 full name of that colour may be used. Note these codes are mainly used to
 indicate the hues of the colour map independent of the lightness/darkness and
 saturation of the colours.
- 
+
 * Mean chroma/saturation is an indication of vividness of the colour map. A
 value of 0 corresponds to a greyscale. A value of 50 or more will indicate a
 vivid colour map.
@@ -198,8 +202,8 @@ Reference: Peter Kovesi. Good Colour Maps: How to Design Them.
 
 Equalise colour contrast over a colour map.
 
-This function is used by cmap() and you would not normally call this function 
-directly. However, you may want to try using this function to equalise the 
+This function is used by cmap() and you would not normally call this function
+directly. However, you may want to try using this function to equalise the
 perceptual contrast of colour maps obtained from some other source.
 
 ```
@@ -213,7 +217,7 @@ Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
               formula - String "CIE76" or "CIEDE2000"
                     W - A 3-vector of weights to be applied to the
                         lightness, chroma and hue components of the
-                        difference equation. It is recommended that you 
+                        difference equation. It is recommended that you
                         use [1, 0, 0] to only take into account lightness.
                         If desired use  [1, 1, 1] for the full formula.
                         See note below.
@@ -289,7 +293,7 @@ W[3].  In general, for the spatial frequencies of interest to us, lightness
 differences are overwhelmingly more important than chroma or hue and W shoud
 be set to [1, 0, 0]
 
-Smoothing parameter sigma: 
+Smoothing parameter sigma:
 The output colour map will have lightness values of constant slope magnitude.
 However, it is possible that the sign of the slope may change, for example at
 the mid point of a bilateral colour map.  This slope discontinuity of lightness
@@ -305,62 +309,6 @@ element colour map seems about right.  As a guideline sigma should not be more
 than about 1/25 of the number of entries in the colour map, preferably less.
 
 
-## viewlabspace
-
-Visualisation of Lab colour space
-
-```
-Usage:    viewlabspace(L = 50, figNo = 1)
-
-Arguments:     L - Lightness level in which to display slice of L*a*b* space
-           figNo - PyPlot figure to use
-```
-Function allows interactive viewing of a sequence of images corresponding to
-different slices of lightness in L*a*b* space.  Lightness varies from 0 to
-100.  Initially a slice at a lightness of 50 is displayed. You can then 
-repeatedly enter new lightness levels to display, or type 'x' to exit.
-
-To Do:
-The CIELAB colour coordinates of the cursor position within the slice images
-should be updated continuously.  This is useful for determining suitable control
-points for the definition of colourmap paths through CIELAB space in cmap().
-
-
-
-## srgb2lab
-
-Convenience function for converting an Nx3 array of RGB values in a
-colour map to an Nx3 array of CIELAB values.  Function can also be
-used to convert a 3 channel RGB image to a 3 channel CIELAB image
-
-Note it appears that the Colors.convert() function uses a default white
-point of D65
-
-```
- Usage:  lab = srgb2lab(rgb)
-
- Argument:    rgb - A N x 3 array of RGB values or a 3 channel RGB image.
- Returns:     lab - A N x 3 array of Lab values of a 3 channel CIELAB image.
-
-```
-
-## lab2srgb
-
-Convenience function for converting an Nx3 array of CIELAB values in a
-colour map to an Nx3 array of RGB values.  Function can also be
-used to convert a 3 channel CIELAB image to a 3 channel RGB image
-
-Note it appears that the Colors.convert() function uses a default white
-point of D65
-
-```
- Usage:  rgb = srgb2lab(lab)
-
- Argument:   lab - A N x 3 array of CIELAB values of a 3 channel CIELAB image.
- Returns:    rgb - A N x 3 array of RGB values or a 3 channel RGB image.
-```
-
-
 ## linearrgbmap
 
 Linear rgb colourmap from black to a specified colour
@@ -371,8 +319,8 @@ Usage: cmap = linearrgbmap(C, N)
 Arguments:  C - 3-vector specifying RGB colour
             N - Number of colourmap elements, defaults to 256
 
-Returns: cmap - N element ColorTypes.RGB colourmap ranging from [0 0 0] 
-                to RGB colour C 
+Returns: cmap - N element ColorTypes.RGB colourmap ranging from [0 0 0]
+                to RGB colour C
 ```
 It is suggested that you pass the resulting colour map to equalisecolourmap()
 to obtain a map with uniform steps in perceptual lightness
@@ -389,9 +337,9 @@ Applies colourmap to a single channel image to obtain an RGB result.
 ```
 Usage: rgbimg = applycolourmap(img, cmap, range)
 
-Arguments:  img - Single channel image to apply colourmap to. 
+Arguments:  img - Single channel image to apply colourmap to.
                   ::AbstractImage{T,2} or ::Array{Float64,2}
-           cmap - RGB colourmap as generated by cmap(). 
+           cmap - RGB colourmap as generated by cmap().
                   ::Array{ColorTypes.RGB{Float64},1}
           range - Optional 2-vector specifying the min and max values in
                   the image to be mapped across the colour map.  Values
@@ -401,7 +349,7 @@ Arguments:  img - Single channel image to apply colourmap to.
 
 Returns: rgbimg - RGB image of floating point values in the range 0-1.
                   NaN values in the input image are rendered as black.
-                  ::AbstractImage{Float64,3} or ::Array{Float64,3} 
+                  ::AbstractImage{Float64,3} or ::Array{Float64,3}
 ```
 Why use this function when you can simply set a colour map?
 
@@ -414,7 +362,7 @@ perform some scaling of your data to normalise it to a range of, say,
 0-255 before applying a colour map and rendering it on your screen.
 In many cases this is useful. However, if you are wanting to render
 your data with a diverging or cyclic colour map then this behaviour is
-definitely not appropriate because these types of colour maps requires 
+definitely not appropriate because these types of colour maps requires
 that data values are honoured in some way to make any sense.
 
 By providing a 'range' parameter this function allows you to apply a
@@ -451,10 +399,10 @@ Keyword arguments:
 
            amp - Amplitude image used to modulate the mapped colours of the
                  angular data.  If not supplied no modulation of colours is
-                 performed. 
+                 performed.
                  ::AbstractImage or ::Array{Float64,2}
    modtoblack  - Boolean flag/1 indicating whether the amplitude image is used to
-                 modulate the colour mapped image values towards black, 
+                 modulate the colour mapped image values towards black,
                  or towards white.  The default is true, towards black.
    cyclelength - The cycle length of the angular data.  Use a value of pi
                  if the data represents orientations, or 2*pi if the data
@@ -463,7 +411,7 @@ Keyword arguments:
                  rendered appropriately. Default is 2*pi.
 
 Returns: rgbim - The rendered image.
-                 ::AbstractImage{Float64,3} or ::Array{Float64,3} 
+                 ::AbstractImage{Float64,3} or ::Array{Float64,3}
 ```
 
 For a list of all cyclic colour maps that can be generated by cmap() use:
@@ -472,7 +420,7 @@ For a list of all cyclic colour maps that can be generated by cmap() use:
 > cmap("cyclic")  
 ```
 
-## applydivergingcolourmap/applydivergingcolormap 
+## applydivergingcolourmap/applydivergingcolormap
 
 Applies a diverging colour map to an image.
 
@@ -493,12 +441,12 @@ Arguments:
            map - Colour map to render the data with.
         refval - Reference value to be associated with centre point of
                  diverging colour map.  Defaults to 0.
-Returns: 
+Returns:
         rgbimg - The rendered image.
-                 ::AbstractImage{Float64,3} or ::Array{Float64,3} 
+                 ::AbstractImage{Float64,3} or ::Array{Float64,3}
 ```
 For a list of all diverging colour maps that can be generated by cmap()
-use: 
+use:
 
 ```
 > cmap("div")
@@ -506,6 +454,7 @@ use:
 
 
 ## ternaryimage
+![ternary example image](ternaryexample.png)
 
 Perceptualy uniform ternary image from 3 bands of data.
 
@@ -524,6 +473,7 @@ Usage: rgbimg = ternaryimage(img, bands, histcut; RGB)
 
 Arguments
             img - Multiband image with at least 3 bands.
+                  ::AbstractImage{T,3} or ::Array{T<:Real,3}
           bands - Array of 3 values indicating the bands, to be assigned to
                   the red, green and blue basis colour maps.  If omitted
                   bands defaults to [1, 2, 3].
@@ -532,27 +482,77 @@ Arguments
                   ternary image you have clipped too much. Defaults to 0.
 
 Keyword argument:
-            RGB - Boolean flag, if set to true the classical RGB primaries 
-                  are used to construct the ternary image rather than the 
+            RGB - Boolean flag, if set to true the classical RGB primaries
+                  are used to construct the ternary image rather than the
                   lightness matched primaries. Defaults to false.
 
 Returns:  
           rgbimg - RGB ternary image
-                  ::AbstractImage{T,3} or ::Array{Float64,3} 
+                  ::AbstractImage{T,3} or ::Array{T<:Real,3}
 ```
 For the derivation of the three primary colours see:
 Peter Kovesi. Good Colour Maps: How to Design Them.
 [arXiv:1509.03700 [cs.GR] 2015](https://arxiv.org/abs/1509.03700)
 
 
+## relief
+![dem shading image](demshading.png)
+
+Generates relief shaded image
+
+```
+Usage:  shadeimg = relief(img, azimuth, elevation, dx, rgbimg)
+
+Arguments: img - Image/heightmap to be relief shaded.
+       azimuth - Of light direction in degrees. Zero azimuth points
+                 upwards and increases clockwise. Defaults to 45.
+     elevation - Of light direction in degrees. Defaults to 45.
+     gradscale - Scaling to apply to the surface gradients.  If the shading
+                 is excessive decrease the scaling. Try successive doubling
+                 or halving to find a good value.
+        rgbimg - Optional RGB image to which the shading pattern derived
+                 from 'img' is applied.   Alternatively, rgbimg can be a
+                 colour map of type ::Array{ColorTypes.RGB{Float64},1}
+                 obtained from cmap().  This colour map is applied to the input
+                 image/heightmap in order to obtain a RGB image to which
+                 the shading pattern is applied.
+```
+Lambertian shading is used to form the relief image.  This obtained from the
+cosine of the angle between the surface normal and light direction.  Note that
+shadows are ignored.  Thus a small feature that might otherwise be in the
+shadow of a nearby large structure is rendered as if the large feature was not
+there.
+
+
+## viewlabspace
+![lab slice image](labslice.png)
+
+Visualisation of Lab colour space
+
+```
+Usage:    viewlabspace(L = 50, figNo = 1)
+
+Arguments:     L - Lightness level in which to display slice of L*a*b* space
+           figNo - PyPlot figure to use
+```
+Function allows interactive viewing of a sequence of images corresponding to
+different slices of lightness in L*a*b* space.  Lightness varies from 0 to 100.  Initially a slice at a lightness of 50 is displayed. You can then
+repeatedly enter new lightness levels to display, or type 'x' to exit.
+
+To Do:
+The CIELAB colour coordinates of the cursor position within the slice images
+should be updated continuously.  This is useful for determining suitable control
+points for the definition of colourmap paths through CIELAB space in cmap().
+
 
 ## sineramp  
+![sineramp image](sineramp.png)
 
 Generates sine on a ramp colour map test image.
 
 The test image consists of a sine wave superimposed on a ramp function The
 amplitude of the sine wave is modulated from its full value at the top of the
-image to 0 at the bottom. 
+image to 0 at the bottom.
 
 The image is useful for evaluating the effectiveness of different colour maps.
 Ideally the sine wave pattern should be equally discernible over the full
@@ -572,15 +572,14 @@ Arguments:     sze - (rows, cols) specifying size of test image.
                      integer number of sine wave cycles across the image.
                amp - Amplitude of sine wave. Defaults to 12.5
            wavelen - Wavelength of sine wave in pixels. Defaults to 8.
-                 p - Power to which the linear attenuation of amplitude, 
+                 p - Power to which the linear attenuation of amplitude,
                      from top to bottom, is raised.  For no attenuation use
                      p = 0.  For linear attenuation use a value of 1.  For
                      contrast sensitivity experiments use larger values of
-                     p.  The default value is 2. 
-``` 
+                     p.  The default value is 2.
+```
 The ramp function that the sine wave is superimposed on is adjusted slightly
-for each row so that each row of the image spans the full data range of 0 to
-255.  Thus using a large sine wave amplitude will result in the ramp at the
+for each row so that each row of the image spans the full data range of 0 to 255.  Thus using a large sine wave amplitude will result in the ramp at the
 top of the test image being reduced relative to the slope of the ramp at
 the bottom of the image.
 
@@ -589,7 +588,7 @@ To start with try
 ```
   > img = sineramp()
 ```
-This is equivalent to 
+This is equivalent to
 
 ```
   > img = sineramp((256 512), 12.5, 8, 2)
@@ -620,7 +619,9 @@ colour map. It is not uncommon for colour maps to have perceptual flat spots
 that can hide features of this magnitude.
 
 
-## circlesineramp 
+## circlesineramp
+
+![circlesineramp image](circlesineramp.png)
 
 Generates a test image for evaluating cyclic colour maps.
 
@@ -632,11 +633,11 @@ Arguments:     sze - Size of test image.  Defaults to 512x512.
                amp - Amplitude of sine wave. Defaults to pi/10
            wavelen - Wavelength of sine wave at half radius of the
                      circular test image. Defaults to 8 pixels.
-                 p - Power to which the linear attenuation of amplitude, 
+                 p - Power to which the linear attenuation of amplitude,
                      from outside edge to centre, is raised.  For no
                      attenuation use p = 0.  For linear attenuation use a
                      value of 1.  The default value is 2, quadratic
-                     attenuation. 
+                     attenuation.
               hole - Flag 0/1 indicating whether the test image should have
                      a 'hole' in its centre.  The default is 1, to have a
                      hole, this removes the distraction of the orientation
@@ -680,7 +681,7 @@ whether the data is cyclic over pi, or 2*pi.
 
 
 
-## histtruncate 
+## histtruncate
 
 Truncates ends of an image histogram.
 
@@ -694,7 +695,7 @@ have the overall effect of darkening the rest of the image after
 rescaling.
 
 ```
-Usage: 
+Usage:
 1)   newimg = histtruncate(img, lHistCut, uHistCut)
 2)   newimg = histtruncate(img, HistCut)
 
@@ -737,3 +738,60 @@ Arguments:  img     - A grey-level input image.
 ```
 Offsets and rescales image so that nimg has mean reqmean and variance
 reqvar.  
+
+
+## srgb2lab
+
+Convenience function for converting an Nx3 array of RGB values in a
+colour map to an Nx3 array of CIELAB values.  Function can also be
+used to convert a 3 channel RGB image to a 3 channel CIELAB image
+
+Note it appears that the Colors.convert() function uses a default white
+point of D65
+
+```
+ Usage:  lab = srgb2lab(rgb)
+
+ Argument:    rgb - A N x 3 array of RGB values or a 3 channel RGB image.
+ Returns:     lab - A N x 3 array of Lab values of a 3 channel CIELAB image.
+
+```
+
+## lab2srgb
+
+Convenience function for converting an Nx3 array of CIELAB values in a
+colour map to an Nx3 array of RGB values.  Function can also be
+used to convert a 3 channel CIELAB image to a 3 channel RGB image
+
+Note it appears that the Colors.convert() function uses a default white
+point of D65
+
+```
+ Usage:  rgb = srgb2lab(lab)
+
+ Argument:   lab - A N x 3 array of CIELAB values of a 3 channel CIELAB image.
+ Returns:    rgb - A N x 3 array of RGB values or a 3 channel RGB image.
+```
+
+## convert
+
+The following conversions are provided by the package:
+
+* Convert an array of ColorTypes RGB values to an array of UInt32 values
+for use as a colour map in Winston
+
+```
+convert(::Type{UInt32}, rgb::Array{ColorTypes.RGB{Float64},1})
+```
+
+* Convert Nx3 Float64 array to  N array of ColorTypes.RGB{Float64}
+
+```
+convert(::Type{Array{ColorTypes.RGB{Float64},1}}, cmap::Array{Float64,2})
+```
+
+* Convert N array of ColorTypes.RGB{Float64} to Nx3 Float64 array
+
+```
+convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGB{Float64},1})
+```

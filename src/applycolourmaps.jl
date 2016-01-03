@@ -67,7 +67,7 @@ See also: cmap, applycycliccolourmap, applydivergingcolourmap
 # November  2013 - Original Matlab code
 # November  2015 - Ported to Julia
 
-function applycolourmap(imgin::Array{Float64,2}, cmap::Array{ColorTypes.RGB{Float64},1}, range::Array)
+function applycolourmap{T}(imgin::Array{T,2}, cmap::Array{ColorTypes.RGB{Float64},1}, range::Array)
     
     ncolours = length(cmap)
     @assert ndims(imgin) == 2   "Image must be single channel"
@@ -186,6 +186,7 @@ Usage: rgbimg = ternaryimage(img, bands, histcut; RGB)
 
 Arguments
             img - Multiband image with at least 3 bands.
+                  ::AbstractImage{T,3} or ::Array{T<:Real,3} 
           bands - Array of 3 values indicating the bands, to be assigned to
                   the red, green and blue basis colour maps.  If omitted
                   bands defaults to [1, 2, 3].
@@ -200,7 +201,7 @@ Keyword argument:
 
 Returns:  
           rgbimg - RGB ternary image
-                  ::AbstractImage{T,3} or ::Array{Float64,3} 
+                  ::AbstractImage{T,3} or ::Array{T<:Real,3} 
 ```
 For the derivation of the three primary colours see:
 Peter Kovesi. Good Colour Maps: How to Design Them.
@@ -208,8 +209,10 @@ arXiv:1509.03700 [cs.GR] 2015.
 
 See also: applycolourmap, linearrgbmap
 """
-function ternaryimage(img::Array{Float64,3}; bands::Array = [1 2 3], histcut::Real = 0.0, RGB::Bool=false)
+function ternaryimage{T<:Real}(img::Array{T,3}; bands::Array = [1, 2, 3], 
+                               histcut::Real = 0.0, RGB::Bool=false)
 
+    N = 256
     (rows, cols, chan) = size(img)
 
     if minimum(bands) < 1 || maximum(bands) > chan
@@ -233,11 +236,11 @@ function ternaryimage(img::Array{Float64,3}; bands::Array = [1 2 3], histcut::Re
     Bmap = equalisecolourmap("rgb", linearrgbmap(B, N))
     
     if histcut > eps()
-        rgbim = applycolourmap(histtruncate(img[:,:,bands[1]], histcut), Rmap) + 
+        rgbimg = applycolourmap(histtruncate(img[:,:,bands[1]], histcut), Rmap) + 
         applycolourmap(histtruncate(img[:,:,bands[2]], histcut), Gmap) + 
         applycolourmap(histtruncate(img[:,:,bands[3]], histcut), Bmap)
     else
-        rgbim = applycolourmap(img[:,:,bands[1]], Rmap) + 
+        rgbimg = applycolourmap(img[:,:,bands[1]], Rmap) + 
         applycolourmap(img[:,:,bands[2]], Gmap) + 
         applycolourmap(img[:,:,bands[3]], Bmap)
     end

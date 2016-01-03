@@ -237,7 +237,7 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
     # Finally, because of the knot arrangements, the start of the spline may not
     # be close to the first control point if the spline order is 3 or greater.
     # Normally for a closed spline this is irrelevant.  However for our purpose
-    # of using closed bplines to form paths in a colour space this is important to
+    # of using closed b splines to form paths in a colour space this is important to
     # us.  The simple brute force solution used here is to search through the
     # spline points for the point that is closest to the 1st control point and
     # then rotate the spline points accordingly
