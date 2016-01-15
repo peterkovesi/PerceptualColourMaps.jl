@@ -1,3 +1,18 @@
+#=----------------------------------------------------------------------------
+
+Copyright (c) 2015 Peter Kovesi
+pk@peterkovesi.com
+ 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, subject to the following conditions:
+ 
+The above copyright notice and this permission notice shall be included in 
+all copies or substantial portions of the Software.
+
+The Software is provided "as is", without warranty of any kind.
+
+----------------------------------------------------------------------------=#
 
 import Images
 export relief
@@ -7,7 +22,7 @@ export relief
 relief -  Generates relief shaded image
 
 ```
-Usage:  shadeimg = relief(img, azimuth, elevation, dx, rgbimg)
+Usage:  shadeimg = relief(img, azimuth, elevation, gradscale, rgbimg)
 
 Arguments: img - Image/heightmap to be relief shaded. ::Array{T<:Real,2}
        azimuth - Of light direction in degrees. Zero azimuth points 
@@ -88,17 +103,12 @@ end
     
 
 # Case where a colour map is supplied rather than a RGB img
-function relief{T1<:Real}(img::Array{T1,2}, az::Real=45, el::Real=45, 
-                      gradscale::Real=1, 
-rgbmap::Array{ColorTypes.RGB{Float64},1}=Array{ColorTypes.RGB{Float64}}(0))
+function relief{T1<:Real}(img::Array{T1,2}, az::Real, el::Real, 
+                          gradscale::Real, 
+                          rgbmap::Array{ColorTypes.RGB{Float64},1})
 
-    if !isempty(rgbmap)  # Apply colour map to image data
-        rgbimg = applycolourmap(img, rgbmap)
-
-    else  # Pass an empty 3D 'image' to relief()
-        rgbimg = Array{Float64}(0,0,0)
-    end
-   
+    # Apply colour map to input image and use this as rgbimg
+    rgbimg = applycolourmap(img, rgbmap)
     return relief(img, az, el, gradscale, rgbimg)
 end
 

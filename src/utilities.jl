@@ -18,7 +18,7 @@ The Software is provided "as is", without warranty of any kind.
 # generation code.  These functions will eventually move into an image
 # processing package that I am slowing building
 
-export bbspline, pbsline, gaussfilt1d, interp1d, matprint
+export bbspline, pbspline, gaussfilt1d, interp1, matprint
 export normalise, normalize
 export histtruncate, meshgrid
 export sineramp, circlesineramp
@@ -148,6 +148,7 @@ See also: bbspline
 # PK March 2014
 # Needs a bit of tidying up and checking on domain of curve
 # Should be merged with bbspline
+# Issue: If N is too small one can get out of bounds errors at line 193
 
 function pbspline(Pin::Array, k::Int, N::Int = 100)
 
@@ -304,12 +305,22 @@ Simple 1D linear interpolation of an array of data
 ```
  Usage:  yi = interp1(x, y, xi)
 
+Arguments:  x - Array of coordinates at which y is defined.
+            y - Array of values at coordinates x.
+           xi - Coordinate locations at which you wish to interpolate y values.
+
+Returns:   yi - Values linearly interpolated from y at xi.
+
 ```
 Interpolates y, defined at values x, at locations xi and returns the
 corresponding values as yi
 
 x is assumed increasing but not necessarily equi-spaced.
 xi values do not need to be sorted.
+
+If any xi are outside the range of x then the corresponding value of
+yi is set to the appropriate end value of y.
+
 """
 
 #function interp1{T<:Real}(x::AbstractArray{T,1}, y::AbstractArray{T,1}, xi::Array{T,1})
@@ -662,8 +673,8 @@ Arguments:     sze - Size of test image.  Defaults to 512x512.
                      attenuation use p = 0.  For linear attenuation use a
                      value of 1.  The default value is 2, quadratic
                      attenuation. 
-              hole - Flag 0/1 indicating whether the test image should have
-                     a 'hole' in its centre.  The default is 1, to have a
+              hole - Boolean flag indicating whether the test image should have
+                     a 'hole' in its centre.  The default is true, to have a
                      hole, this removes the distraction of the orientation
                      singularlity at the centre.
 Returns:

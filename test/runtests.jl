@@ -1,5 +1,7 @@
 using PerceptualColourMaps
 using Base.Test
 
-# write your own tests here
-@test 1 == 1
+include("test_cmap.jl")
+include("test_applycolourmaps.jl")
+include("test_relief.jl")
+include("test_utilities.jl")

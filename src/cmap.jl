@@ -1611,6 +1611,7 @@ Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
 
 Returns:    newrgbmap - RGB colour map adjusted so that the perceptual
                         contrast of colours along the colour map is constant.
+                        This is a Nx3 Array of Float64 values.
 ```
 Suggested parameters:
 
@@ -1918,6 +1919,7 @@ Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
 
 Returns:    newrgbmap - RGB colour map adjusted so that the perceptual
                         contrast of colours along the colour map is constant.
+                        This is a Nx3 Array of Float64 values.
 
 For full documentation see equalisecolourmap()
                                  ^     ^
