@@ -5,7 +5,7 @@ os:
   - osx
 julia:
   - release
-  - nightly
+#  - nightly
 notifications:
   email: false
 script:
