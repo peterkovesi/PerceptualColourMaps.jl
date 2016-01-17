@@ -114,7 +114,7 @@ function bbspline(P::Array, k::Int, N::Int = 100)
     S = zeros(dim, length(t))
 
     for d = 1:dim, i = 1:np1
-        S[d,:] += P[d,i]*B[i]
+        S[d,:] += P[d,i]*B[i]'
     end
     
     # Set the last point of the spline. This is not evaluated by the code above
@@ -232,7 +232,7 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
     S = zeros(dim, length(t))
     
     for d = 1:dim, i = 1:np1
-        S[d,:] += P[d,i]*B[i]
+        S[d,:] += P[d,i]*B[i]'
     end
     
     # Finally, because of the knot arrangements, the start of the spline may not
