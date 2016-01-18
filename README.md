@@ -13,7 +13,7 @@ PerceptualColourMaps
 
 ## Summary
 
-The Perceptual Colour Maps package provides functions for creating high quality
+The Perceptual Colour Maps package  provides functions for creating high quality
 colour maps that have consistent perceptual contrast over their full range.  It
 also provides functions for generating colour map test images, functions to
 assist with the correct rendering of data with colour maps, and functions for
