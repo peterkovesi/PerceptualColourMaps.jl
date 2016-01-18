@@ -84,18 +84,18 @@ yrange = 2:.5:6
 (x,y) = meshgrid(xrange, yrange) # two arguments
 (rows,cols) = size(x)
 for r = 1:rows
-    @test all(x[r,:] .== xrange')
+    @test all(x[r:r,:] .== xrange')
 end
 for c = 1:cols
-    @test all(y[:,c] .== yrange)
+    @test all(y[:,c:c] .== yrange)
 end
 
 arange = 2:.1:4
 (x,y) = meshgrid(arange)  # one argument
 (rows,cols) = size(x)
 for r = 1:rows
-    @test all(x[r,:] .== arange')
+    @test all(x[r:r,:] .== arange')
 end
 for c = 1:cols
-    @test all(y[:,c] .== arange)
+    @test all(y[:,c:c] .== arange)
 end
