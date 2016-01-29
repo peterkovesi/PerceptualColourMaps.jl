@@ -7,8 +7,9 @@ PerceptualColourMaps
 
 ## Installation
 
+Install via the package manager
 ```
-> Pkg.clone("https://github.com/peterkovesi/PerceptualColourMaps.jl.git")
+> Pkg.add("PerceptualColourMaps")
 ```
 
 ## Summary
