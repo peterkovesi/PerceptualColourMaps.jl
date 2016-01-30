@@ -16,7 +16,7 @@ Install via the package manager
 
 The Perceptual Colour Maps package  provides functions for creating high quality
 colour maps that have consistent perceptual contrast over their full range.  It
-also provides functions for generating colour map test images, functions to
+also  provides functions for generating colour map test images, functions to
 assist with the correct rendering of data with colour maps, and functions for
 generating relief shaded images and perceptually uniform ternary images.
 
