@@ -3,6 +3,13 @@ PerceptualColourMaps
 
 [![Build Status](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl.svg?branch=master)](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl)
 
+If the build status indicates an error click on the build link to
+identify the version of Julia on which tests have failed. It may be
+that the build is fine for the stable release of Julia, but failed on
+the nightly release.
+
+--------------------------------------------
+
 ![banner image](doc/banner.png)
 
 ## Installation
