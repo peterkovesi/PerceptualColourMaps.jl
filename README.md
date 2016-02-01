@@ -18,6 +18,10 @@ Install via the package manager
 ```
 > Pkg.add("PerceptualColourMaps")
 ```
+If the above does not work try:
+```
+> Pkg.clone("https://github.com/peterkovesi/PerceptualColourMaps.jl.git")
+```
 
 ## Summary
 
