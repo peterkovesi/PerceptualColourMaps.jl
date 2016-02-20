@@ -184,6 +184,12 @@ values are honoured appropriately when you map them to colours.
 crash!).  ImageView and Winston use Tk which means that you may have
 to take care which image display functions you choose to use.
 
+These colour maps can also be passed to the `Plots.ColorGradient` constructor.
+Here's an example using the 'Rainbow 3' diverging colour map for a scatter plot.
+```
+> Using Plots
+> y=rand(100); scatter(y, zcolor=y, marker=ColorGradient(cmap("R3")[1]))
+```
 
 
 ## Organisation of the Colour Maps
