@@ -44,8 +44,8 @@ amplitude of the sine wave is modulated from its full value at the top
 of the image to 0 at the bottom.
 
 What we are hoping to see is the sine wave uniformly visible across
-the image from left to right. We also want the contrast level —the
-distance down the image at which the sine wave remains discernible—
+the image from left to right. We also want the contrast level, the
+distance down the image at which the sine wave remains discernible,
 to be uniform across the image. At the very bottom of the image, where
 the sine wave amplitude is 0, we just have a linear ramp which simply
 reproduces the colour map. Given that the underlying data is a
