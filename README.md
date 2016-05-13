@@ -8,7 +8,7 @@ identify the version of Julia on which tests have failed. It may be
 that the build is fine for the stable release of Julia, but failed on
 the nightly release.
 
---------------------------------------------
+--------------------------------------------  
 
 ![banner image](doc/banner.png)
 
