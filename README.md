@@ -1,12 +1,9 @@
-PerceptualColourMaps    
+PerceptualColourMaps  
 ====================
 
-[![Build Status](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl.svg?branch=master)](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl)
+# (Perceptual Color Maps)
 
-If the build status indicates an error click on the build link to
-identify the version of Julia on which tests have failed. It may be
-that the build is fine for the stable release of Julia, but failed on
-the nightly release.
+[![Build Status](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl.svg?branch=master)](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl)
 
 --------------------------------------------  
 
@@ -15,21 +12,19 @@ the nightly release.
 ## Installation
 
 Install via the package manager
+
 ```
 > Pkg.add("PerceptualColourMaps")
-```
-If the above does not work try:
-```
-> Pkg.clone("https://github.com/peterkovesi/PerceptualColourMaps.jl.git")
 ```
 
 ## Summary
 
-The Perceptual Colour Maps package  provides functions for creating high quality
-colour maps that have consistent perceptual contrast over their full range.  It
-also  provides functions for generating colour map test images, functions to
-assist with the correct rendering of data with colour maps, and functions for
-generating relief shaded images and perceptually uniform ternary images.
+The Perceptual Colour/Color Maps package provides functions for creating
+high quality colour maps that have consistent perceptual contrast over
+their full range.  It also provides functions for generating colour
+map test images, functions to assist with the correct rendering of
+data with colour maps, and functions for generating relief shaded
+images and perceptually uniform ternary images.
 
 Many colour maps provided by vendors have highly uneven perceptual
 contrast over their range. Colour maps may have points of locally high
