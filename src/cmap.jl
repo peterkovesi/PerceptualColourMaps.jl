@@ -14,10 +14,12 @@ The Software is provided "as is", without warranty of any kind.
 
 ----------------------------------------------------------------------------=#
 
-export cmap, equalisecolourmap, equalizecolormap, linearrgbmap, UInt32colormap, convert
+export cmap, equalisecolourmap, equalizecolormap, linearrgbmap, UInt32colormap
 export lab2srgb, srgb2lab
 
-import Grid, Colors, ColorTypes, PyPlot  
+import Colors, ColorTypes, PyPlot
+import Base: convert
+using Interpolations
 
 # There seems to be a fatal clash between PyPlot and Tk.  ImageView
 # and Winston use Tk so unfortunately they have been excluded and all
@@ -28,25 +30,25 @@ import Grid, Colors, ColorTypes, PyPlot
 # Type for defining colour maps for storage in a dictionary
 
 type colourmapdef
-    name::ASCIIString
-    hueStr::ASCIIString
-    attributeStr::ASCIIString
-    desc::ASCIIString
-    colourspace::ASCIIString
+    name::Compat.ASCIIString
+    hueStr::Compat.ASCIIString
+    attributeStr::Compat.ASCIIString
+    desc::Compat.ASCIIString
+    colourspace::Compat.ASCIIString
     colpts::Array{Float64,2}
     splineorder::Int64
-    formula::ASCIIString
+    formula::Compat.ASCIIString
     W::Array{Float64,1}
     sigma::Float64
 end
 
 # Convenience constructor
 function newcolourmapdef{T1<:Real, T2<:Real, T3<:Real}(;
-     name::ASCIIString="",
-     hueStr::ASCIIString="",
-     attributeStr::ASCIIString="",
-     desc::ASCIIString="",
-     colourspace::ASCIIString="",
+     name::Compat.ASCIIString="",
+     hueStr::Compat.ASCIIString="",
+     attributeStr::Compat.ASCIIString="",
+     desc::Compat.ASCIIString="",
+     colourspace::Compat.ASCIIString="",
      colpts::Array{T1,2}=[0 0 0],
      splineorder::Int=2,
      formula="CIE76",
@@ -69,11 +71,12 @@ perceptual contrast is dominated by *lightness* difference, chroma and
 hue are relatively unimportant.
 
 ```
-Usage:  1:  (map, name, desc) = cmap(I, keyword_params ...)
-        2:  cmap(searchStr)
-        3:  cmap()
+Usage:  1:  map = cmap(I, keyword_params ...)
+        2:  (map, name, desc) = cmap(I, keyword_params ..., returnname=true)
+        3:  cmap(searchStr)
+        4:  cmap()
 
-Arguments for Usage 1:
+Arguments for Usage 1 and 2:
 
             I - A string label indicating the colour map to be generated or a
                 string specifying a colour map name or attribute to search
@@ -107,14 +110,19 @@ Arguments for Usage 1:
 diagnostics::Bool - If true displays various diagnostic plots. Note the
                     diagnostic plots will be for the map _before_ any cyclic
                     shifting or reversing is applied. Defaults to false.
+ returnname::Bool - If true the function returns a tuple of the colourmap, its 
+                    name and its description  (colourmap, name, description)
+                    The default value is false, just the colourmap is returned.
 
 Returns:
-          map - Array of ColorTypes.RGB{Float64,1} giving the rgb colour map
+          map - Array of ColorTypes.RGBA{Float64,1} giving the rgb colour map.
+
+     If returnname=true the function additionally returns 
          name - A string giving a nominal name for the colour map
          desc - A string giving a brief description of the colour map
 ```
 
-Usage 2 and 3:  cmap(searchStr)
+Usage 3 and 4:  cmap(searchStr)
 
 Given the large number of colour maps that this function can create this usage
 option provides some help by listing the numbers of all the colour maps with
@@ -132,23 +140,20 @@ be created in order to determine its full name.
 
 **Using the colour maps:**
 
+PyPlot:
 ```
-> Using PyPlot
+> using PyPlot
 > sr = sineramp();    # Generate the sineramp() colour map test image.
 > imshow(sr);         # Display with matplotlib's default 'jet' colour map.
                       # Note the perceptual dead spots in the map.
-> set_cmap(ColorMap(cmap("L3")[1])) # Apply the cmap() heat colour map.
+> imshow(sr, cmap = ColorMap(cmap("L3"))); # Apply the cmap() heat colour map.
 ```
-Note above in the call cmap("L3")[1] the [1] ensures that just the colour
-map in the tuple returned by cmap() is passed to the PyPlot.ColorMap
-constructor
 
+Plots:
 ```
-> Using Winston
-> colormap(cmap("R1")[1]); # Set Winston's colour map to the cmap() rainbow 
-                           # colour map first.
-> imagesc(sr);             # Then display the image
-
+> using Plots
+> y=rand(100); 
+> Plots.scatter(y, zcolor=y, marker=ColorGradient(cmap("R3")));
 ```
 
 You can also apply a colour map to a single channel image to create a
@@ -158,17 +163,17 @@ values are honoured appropriately when you map them to colours.
 
 ```
   Apply the L4 heat colour map to the test image 
-> rgbimg = applycolourmap(sr, cmap("L4")[1]);
+> rgbimg = applycolourmap(sr, cmap("L4"));
 
   Apply a diverging colour map to the test image using 127 as the
   value that is associated with the centre point of the diverging
   colour map
-> rgbimg = applydivergingcolourmap(sr, cmap("D1")[1],127);
+> rgbimg = applydivergingcolourmap(sr, cmap("D1"),127);
 
   Apply a cyclic colour map to the circlesineramp() test image specifying 
   a data cyclelength of 2*pi.
 > (cr,) = circlesineramp();   # Generate a cyclic colour map test image.
-> rgbimg = applycycliccolourmap(cr, cmap("C1")[1], cyclelength=2*pi);
+> rgbimg = applycycliccolourmap(cr, cmap("C1"), cyclelength=2*pi);
 
 > ImageView.view(rgbimg)      # Display the image with ImageView
 > PyPlot.imshow(rgbimg)       # or with PyPlot
@@ -281,6 +286,7 @@ arXiv:1509.03700 [cs.GR] 2015.
 
 October  2015 - Ported to Julia from MATLAB 
 December 2015 - Tweaked control points for some colour maps to keep them in gamut
+November 2016 - Compatibility with 0.5, Mods to heat colour map
 
 ----------------------------------------------------------------------------=#
 
@@ -289,7 +295,7 @@ function cmap()
 end
 
 function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0, 
-              reverse::Bool = false, diagnostics::Bool = false)
+              reverse::Bool = false, diagnostics::Bool = false, returnname::Bool = false)
 
     I = uppercase(I)  # This means you must use uppercase keys in the dictionary
 
@@ -327,7 +333,31 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0))
     
     # HEATWHITE
+    # Heat map from straight line segments from black to red to yellow
+    # to white but with the corners at red and yellow rounded off.
+    # Works well
     push!(cmapdef, "L3" =>     
+          newcolourmapdef(desc = "Black-Red-Yellow-White heat colour map",
+                          hueStr = "kryw",
+                          attributeStr = "linear",
+                          colourspace = "RGB",
+                          colpts = [0.0  0.0  0.0
+                                    0.85 0.0  0.0
+                                    1.0  0.15 0.0
+                                    1.0  0.85 0.0
+                                    1.0  1.0  0.15
+                                    1.0  1.0  1.0 ],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
+        
+    push!(cmapdef, "HEAT" => cmapdef["L3"])  # Convenience name
+    push!(cmapdef, "HEATWHITE" => cmapdef["L3"])  # Convenience name
+
+
+    # HEATWHITE Old
+    push!(cmapdef, "L3OLD" =>     
           newcolourmapdef(desc = "Black-Red-Yellow-White heat colour map",
                           hueStr = "kryw",
                           attributeStr = "linear",
@@ -346,12 +376,28 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
-        
-    push!(cmapdef, "HEAT" => cmapdef["L3"])  # Convenience name
-    push!(cmapdef, "HEATWHITE" => cmapdef["L3"])  # Convenience name
+
 
     # "HEATYELLOW"
     push!(cmapdef, "L4" =>     
+          newcolourmapdef(desc = "Black-Red-Yellow heat colour map",
+                          hueStr = "kry",
+                          attributeStr = "linear",
+                          colourspace = "RGB",
+                          colpts = [0.0  0.0  0.0
+                                    0.85 0.0  0.0
+                                    1.0  0.15 0.0
+                                    1.0  1.0  0.0 ],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0.0))
+
+    push!(cmapdef, "HEATYELLOW" => cmapdef["L4"])  # Convenience name    
+
+
+    # "HEATYELLOW"  OLD
+    push!(cmapdef, "L4OLD" =>     
           newcolourmapdef(desc = "Black-Red-Yellow heat colour map",
                           hueStr = "kry",
                           attributeStr = "linear",
@@ -371,7 +417,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 0.0))
 
-    push!(cmapdef, "HEATYELLOW" => cmapdef["L4"])  # Convenience name    
+
 
     push!(cmapdef, "L5" =>
           newcolourmapdef(desc = "Colour map along the green edge of CIELAB space",
@@ -1520,12 +1566,16 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 =#
 
     # Build an array of ColorTypes.RGB values to return
-    rgbmap = Array{ColorTypes.RGB{Float64}}(N)
+    rgbmap = Array{ColorTypes.RGBA{Float64}}(N)
     for i = 1:N
-        rgbmap[i] = ColorTypes.RGB(map[i,1], map[i,2], map[i,3])
+        rgbmap[i] = ColorTypes.RGBA(map[i,1], map[i,2], map[i,3], 1.0)
     end
 
-    return rgbmap, name, CM.desc
+    if returnname
+        return rgbmap, name, CM.desc
+    else
+        return rgbmap
+    end
 end    
     
 #------------------------------------------------------------------
@@ -1560,7 +1610,7 @@ function catalogue(cmapdef, str="ALL")
     found = false
 
     for label in sort(collect(keys(cmapdef)))
-        map, name, desc = cmap(label)
+        map, name, desc = cmap(label, returnname=true)
 
         if label[1] != 'X'   # do not list experimental maps
             if !isempty(search(uppercase(name), str)) || str == "ALL"
@@ -1593,7 +1643,7 @@ Usage: newrgbmap = equalisecolourmap(rgblab, map, formula, W, sigma, diagnostics
 Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
                         in map.
                   map - A Nx3 RGB or CIELAB colour map
-                        or an array of ColorTypes.RGB{Float64} values
+                        or an array of ColorTypes.RGBA{Float64} values
               formula - String "CIE76" or "CIEDE2000"
                     W - A 3-vector of weights to be applied to the
                         lightness, chroma and hue components of the
@@ -1774,14 +1824,14 @@ function equalisecolourmap(rgblab::AbstractString, cmap::Array{Float64,2},
 
         # newN now represents the locations where we want to interpolate into the
         # colour map to obtain constant perceptual contrast
-        Li = Grid.InterpGrid(L,  Grid.BCnearest, Grid.InterpLinear)
-        L = Li[newN]
+        Li = interpolate(L, BSpline(Linear()), OnCell())
+        L = [Li[v] for v in newN]
 
-        ai = Grid.InterpGrid(a,  Grid.BCnearest, Grid.InterpLinear)
-        a = ai[newN]
+        ai = interpolate(a, BSpline(Constant()), OnCell())
+        a = [ai[v] for v in newN]
 
-        bi = Grid.InterpGrid(b,  Grid.BCnearest, Grid.InterpLinear)
-        b = bi[newN]
+        bi = interpolate(b, BSpline(Constant()), OnCell())
+        b = [bi[v] for v in newN]
 
         # Record initial colour differences for evaluation at the end
         if iter == 1  
@@ -1892,6 +1942,18 @@ function equalisecolourmap(rgblab::AbstractString, cmap::Array{ColorTypes.RGB{Fl
                              sigma, cyclic, diagnostics)
 end
 
+
+# Case when colour map is an array of ColorTypes.RGBA{Float64} 
+
+function equalisecolourmap(rgblab::AbstractString, cmap::Array{ColorTypes.RGBA{Float64},1}, 
+                           formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0], 
+                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+
+    return equalisecolourmap(rgblab, convert(Array{Float64,2},cmap), formula, W, 
+                             sigma, cyclic, diagnostics)
+end
+
+
 # Convenience functions for those who spell colour without a 'u' and equalise with a 'z' ...
 """
 equalisecolourmap - Equalise colour contrast over a colourmap
@@ -1936,6 +1998,17 @@ end
 # Case when colour map is an array of ColorTypes.RGB{Float64} 
 
 function equalizecolormap(rgblab::AbstractString, cmap::Array{ColorTypes.RGB{Float64},1}, 
+                           formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0], 
+                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+
+    return equalisecolourmap(rgblab, convert(Array{Float64,2},cmap), formula, W, 
+                             sigma, cyclic, diagnostics)
+end
+
+
+# Case when colour map is an array of ColorTypes.RGBA{Float64} 
+
+function equalizecolormap(rgblab::AbstractString, cmap::Array{ColorTypes.RGBA{Float64},1}, 
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0], 
                            sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
 
@@ -2163,8 +2236,8 @@ for use as a colour map in Winston
 ```
 See also: cmap
 """
-function UInt32colormap(rgb::Array{ColorTypes.RGB{Float64},1})
-    return convert(UInt32, rgb)
+function UInt32colormap(rgb::Array{ColorTypes.RGBA{Float64},1})
+    return convert(Vector{UInt32}, rgb)
 end
 
 #----------------------------------------------------------------------------
@@ -2172,16 +2245,16 @@ end
 Convert an array of ColorTypes RGB values to an array of UInt32 values
 for use as a colour map in Winston
 ```
- Usage:  uint32rgb = convert(UInt32, rgbmap)
+ Usage:  uint32rgb = convert(Vector{UInt32}, rgbmap)
 
- Argument:   rgbmap - Colour map as an array of ColorTypes.RGB values as 
+ Argument:   rgbmap - Vector of ColorTypes.RGBA values as 
                       returned by cmap().
  
  Returns: uint32rgb - An array of UInt32 values packed with the 8 bit RGB values.
 ```
 See also: cmap
 """
-function convert(::Type{UInt32}, rgb::Array{ColorTypes.RGB{Float64},1})
+function Base.convert(::Type{Vector{UInt32}}, rgb::Vector{ColorTypes.RGBA{Float64}})
 
     N = length(rgb)
     uint32rgb = zeros(UInt32, N)
@@ -2206,7 +2279,7 @@ Usage: cmap = linearrgbmap(C, N)
 Arguments:  C - 3-vector specifying RGB colour
             N - Number of colourmap elements, defaults to 256
 
-Returns: cmap - N element ColorTypes.RGB colourmap ranging from [0 0 0] 
+Returns: cmap - N element ColorTypes.RGBA colourmap ranging from [0 0 0] 
                 to RGB colour C 
 ```
 It is suggested that you pass the resulting colour map to equalisecolourmap()
@@ -2228,13 +2301,13 @@ function linearrgbmap(C::Array, N::Int = 256)
         rgbmap[:,n] = C[n] * ramp
     end
 
-    return convert(Array{ColorTypes.RGB{Float64},1}, rgbmap)
+    return convert(Array{ColorTypes.RGBA{Float64},1}, rgbmap)
 end
 
 #-------------------------------------------------------------------
 # Convert Nx3 Float64 array to  N array of ColorTypes.RGB{Float64}
 
-function convert(::Type{Array{ColorTypes.RGB{Float64},1}}, cmap::Array{Float64,2})
+function Base.convert(::Type{Array{ColorTypes.RGB{Float64},1}}, cmap::Array{Float64,2})
 
     (N,cols) = size(cmap)
     @assert cols == 3  "Color map data must be N x 3"
@@ -2248,9 +2321,26 @@ function convert(::Type{Array{ColorTypes.RGB{Float64},1}}, cmap::Array{Float64,2
 end
 
 #-------------------------------------------------------------------
+# Convert Nx3 Float64 array to  N array of ColorTypes.RGBA{Float64}
+
+function Base.convert(::Type{Array{ColorTypes.RGBA{Float64},1}}, cmap::Array{Float64,2})
+
+    (N,cols) = size(cmap)
+    @assert cols == 3  "Color map data must be N x 3"
+
+    rgbmap = Array{ColorTypes.RGBA{Float64}}(N)
+    for i = 1:N
+        rgbmap[i] = ColorTypes.RGBA(cmap[i,1], cmap[i,2], cmap[i,3],1.0)
+    end
+
+    return rgbmap
+end
+
+
+#-------------------------------------------------------------------
 # Convert N array of ColorTypes.RGB{Float64} to Nx3 Float64 array 
 
-function convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGB{Float64},1})
+function Base.convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGB{Float64},1})
 
     N = length(rgbmap)
 
@@ -2263,4 +2353,21 @@ function convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGB{Float64}
 end
 
 #-------------------------------------------------------------------------
+
+# Convert N array of ColorTypes.RGBA{Float64} to Nx3 Float64 array 
+
+function Base.convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGBA{Float64},1})
+
+    N = length(rgbmap)
+
+    cmap = Array{Float64}(N,3)
+    for i = 1:N
+        cmap[i,:] = [rgbmap[i].r rgbmap[i].g rgbmap[i].b]
+    end
+
+    return cmap
+end
+
+#-------------------------------------------------------------------
+
 

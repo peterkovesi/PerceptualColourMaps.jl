@@ -13,5 +13,5 @@ rimg = relief(img)
 az = 45
 el = 45
 gradscale = 2
-rimg = relief(img, az, el, gradscale, cmap("L10")[1])
+rimg = relief(img, az, el, gradscale, cmap("L10"))
 rimg = relief(img, az, el, gradscale)

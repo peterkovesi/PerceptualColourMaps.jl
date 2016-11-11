@@ -628,7 +628,6 @@ function sineramp(sze=(256,512), amp=12.5, wavelen=8, p=2)
     # evaluate a cyclic colour map.  However you will still see a slight
     # cyclic discontinuity at the top of the image, though this will
     # disappear at the bottom of the test image
-    
     (rows,cols) = sze
     cycles = round(cols/wavelen)
     cols = cycles*wavelen
@@ -642,8 +641,7 @@ function sineramp(sze=(256,512), amp=12.5, wavelen=8, p=2)
     img = A'*fx
     
     # Add ramp
-    ramp,_ = meshgrid(0:(cols-1), 1:rows)
-    ramp = ramp/(cols-1)
+    ramp = [c/(cols-1) for r = 1:rows, c = 0:(cols-1)]
     img = img + ramp*(255.0 - 2*amp)
     
     # Now normalise each row so that it spans the full data range from 0 to 255.
@@ -736,7 +734,7 @@ function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
     cycles = round(circum/wavelen)
     
     # Angles are +ve anticlockwise and mod 2*pi
-    (x,y) = meshgrid((0:sze-1) -sze/2)
+    (x,y) = meshgrid((0:sze-1)-sze/2)
     theta = mod(atan2(-y,x), 2*pi)  
     rad = sqrt(x.^2 + y.^2)
     

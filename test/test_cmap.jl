@@ -37,7 +37,7 @@ rgbmap2 = PerceptualColourMaps.convert(Array{Float64,2},rgbmap)
 
 
 # UInt32colormap
-ui32 = UInt32colormap(cmap("L3")[1])
+ui32 = UInt32colormap(cmap("L3"))
 
 # srgb2lab and lab2srgb
 rgb = [1 0 0

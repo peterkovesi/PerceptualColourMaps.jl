@@ -33,7 +33,7 @@ Arguments: img - Image/heightmap to be relief shaded. ::Array{T<:Real,2}
                  or halving to find a good value. 
         rgbimg - Optional RGB image to which the shading pattern derived
                  from 'img' is applied.   Alternatively, rgbimg can be a
-                 colour map of type ::Array{ColorTypes.RGB{Float64},1}
+                 colour map of type ::Array{ColorTypes.RGBA{Float64},1}
                  obtained from cmap().  This colour map is applied to the input
                  image/heightmap in order to obtain a RGB image to which
                  the shading pattern is applied.
@@ -112,12 +112,24 @@ function relief{T1<:Real}(img::Array{T1,2}, az::Real, el::Real,
     return relief(img, az, el, gradscale, rgbimg)
 end
 
+
+# Case where a colour map is supplied rather than a RGB img
+function relief{T1<:Real}(img::Array{T1,2}, az::Real, el::Real, 
+                          gradscale::Real, 
+                          rgbmap::Array{ColorTypes.RGBA{Float64},1})
+
+    # Apply colour map to input image and use this as rgbimg
+    rgbimg = applycolourmap(img, rgbmap)
+    return relief(img, az, el, gradscale, rgbimg)
+end
+
+
 #---------------------------------------------------------------------------
 # Compute image/heightmap surface normals
 #
 # (n1, n2, n3) = surfacenormals(img, gradscale, loggrad)
 
-function surfacenormals{T<:Real}(img::Array{T,2}, gradscale::Real, loggrad::AbstractString)
+function surfacenormals{T<:Real}(img::Array{T,2}, gradscale::Real, loggrad::Compat.ASCIIString)
 
     loggrad = lowercase(loggrad)
     

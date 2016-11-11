@@ -9,19 +9,19 @@ println("testing applycolourmaps")
 
 # applycolourmap
 img = sineramp()
-(lmap,) = cmap("L1")
+lmap = cmap("L1")
 rnge = [10, 200]
 rgbimg = applycolourmap(img, lmap)
 rgbimg = applycolourmap(img, lmap, rnge)
 
 # applycycliccolourmap
 (ang, mask) = circlesineramp()
-(cycmap,) = cmap("C1")
+cycmap = cmap("C1")
 rgbimg = applycycliccolourmap(ang, cycmap)
 rgbimg = applycycliccolourmap(ang, cycmap, amp = ang, cyclelength = pi)
 
 # applydivergingcolourmap
-(divmap,) = cmap("D1")
+divmap = cmap("D1")
 refval = 0
 rgbim = applydivergingcolourmap(img, divmap, refval)
 
