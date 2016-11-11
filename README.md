@@ -123,7 +123,7 @@ diagnostics::Bool - If true displays various diagnostic plots. Note the
                     The default value is false, just the colourmap is returned.
 
 Returns:
-          map - Array of ColorTypes.RGB{Float64,1} giving the rgb colour map.
+          map - Array of ColorTypes.RGBA{Float64,1} giving the rgb colour map.
 
      If returnname=true the function additionally returns 
          name - A string giving a nominal name for the colour map
