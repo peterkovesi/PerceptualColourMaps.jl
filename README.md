@@ -17,7 +17,7 @@ Install via the package manager
 > Pkg.add("PerceptualColourMaps")
 ```
 
-**Change v0.1.1:** By default cmap() now returns just the colour
+**Latest change** By default cmap() now returns just the colour
 map, this makes it more convenient to use.  If you set the keyword
 argument `returnname = true` the function returns a tuple (colourmap,
 name, description) as before.
