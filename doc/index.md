@@ -480,7 +480,7 @@ This function generates a ternary image using 3 basis colours that are
 closely matched in lightness, as are their secondary colours.  The
 colours are not as vivid as the RGB primaries but they produce ternary
 images with consistent feature salience no matter what permutation of
-channel-colour assignement is used.  This is in contrast to ternary
+channel-colour assignment is used.  This is in contrast to ternary
 images constructed with the RGB primaries where the channel that
 happens to get encoded in green dominates the perceptual result.
 
@@ -812,9 +812,10 @@ RGBAarray = FloatArray2RGBA(rgb)
 
 rgb = RGB2FloatArray(RGBarray)
 rgb = RGBA2FloatArray(RGBAarray)
-```
 
 rgb - Nx3 Float64 array of RGB values
 RGBarray  - ColorTypes.RGB{Float64},1}
 RGBAarray - ColorTypes.RGBA{Float64},1}
+
+```
 
