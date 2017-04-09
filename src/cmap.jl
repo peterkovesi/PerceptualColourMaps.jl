@@ -14,11 +14,12 @@ The Software is provided "as is", without warranty of any kind.
 
 ----------------------------------------------------------------------------=#
 
-export cmap, equalisecolourmap, equalizecolormap, linearrgbmap, UInt32colormap
-export lab2srgb, srgb2lab
+export cmap, equalisecolourmap, equalizecolormap, linearrgbmap
+export lab2srgb, srgb2lab, RGBA2UInt32
+export RGB2FloatArray, RGBA2FloatArray
+export FloatArray2RGB, FloatArray2RGBA
 
 import Colors, ColorTypes, PyPlot
-import Base: convert
 using Interpolations
 
 # There seems to be a fatal clash between PyPlot and Tk.  ImageView
@@ -1402,8 +1403,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           attributeStr = "diverging",
                           hueStr = "bwg",
                           colourspace = "RGB",
-                          colpts = [#0.120752 0.138784 0.214192 # additional point to match lightness at end
-                                    0.231373 0.247059 0.329412
+                          colpts = [0.231373 0.247059 0.329412
                                     0.266667 0.305882 0.411765
                                     0.286275 0.368627 0.478431
                                     0.301961 0.439216 0.549020
@@ -1422,9 +1422,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     0.407843 0.611765 0.305882
                                     0.360784 0.509804 0.231373
                                     0.305882 0.400000 0.160784
-                   #                0.231373 0.278431 0.098039
-                                    0.2218    0.2690    0.0890 # tweeked to match start lightness
-                                    # 0.141176 0.149020 0.043137
+                                    0.2218    0.2690    0.0890 
                                     ],
                           splineorder = 2,
                           formula = "CIE76",
@@ -1924,7 +1922,7 @@ function equalisecolourmap(rgblab::AbstractString, cmap::Array{ColorTypes.RGB{Fl
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0], 
                            sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
 
-    return equalisecolourmap(rgblab, convert(Array{Float64,2},cmap), formula, W, 
+    return equalisecolourmap(rgblab, RGB2FloatArray(cmap), formula, W, 
                              sigma, cyclic, diagnostics)
 end
 
@@ -1935,7 +1933,7 @@ function equalisecolourmap(rgblab::AbstractString, cmap::Array{ColorTypes.RGBA{F
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0], 
                            sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
 
-    return equalisecolourmap(rgblab, convert(Array{Float64,2},cmap), formula, W, 
+    return equalisecolourmap(rgblab, RGBA2FloatArray(cmap), formula, W, 
                              sigma, cyclic, diagnostics)
 end
 
@@ -1987,7 +1985,7 @@ function equalizecolormap(rgblab::AbstractString, cmap::Array{ColorTypes.RGB{Flo
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0], 
                            sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
 
-    return equalisecolourmap(rgblab, convert(Array{Float64,2},cmap), formula, W, 
+    return equalisecolourmap(rgblab, RGB2FloatArray(cmap), formula, W, 
                              sigma, cyclic, diagnostics)
 end
 
@@ -1998,7 +1996,7 @@ function equalizecolormap(rgblab::AbstractString, cmap::Array{ColorTypes.RGBA{Fl
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0], 
                            sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
 
-    return equalisecolourmap(rgblab, convert(Array{Float64,2},cmap), formula, W, 
+    return equalisecolourmap(rgblab, RGBA2FloatArray(cmap), formula, W, 
                              sigma, cyclic, diagnostics)
 end
 
@@ -2213,25 +2211,7 @@ end
 Convert an array of ColorTypes RGB values to an array of UInt32 values
 for use as a colour map in Winston
 ```
- Usage:  uint32rgb = UInt32colormap(cmap)
-
- Argument:     cmap - Colour map as an array of ColorTypes.RGB values as 
-                      returned by cmap().
- 
- Returns: uint32rgb - An array of UInt32 values packed with the 8 bit RGB values.
-```
-See also: cmap
-"""
-function UInt32colormap(rgb::Array{ColorTypes.RGBA{Float64},1})
-    return convert(Vector{UInt32}, rgb)
-end
-
-#----------------------------------------------------------------------------
-"""
-Convert an array of ColorTypes RGB values to an array of UInt32 values
-for use as a colour map in Winston
-```
- Usage:  uint32rgb = convert(Vector{UInt32}, rgbmap)
+ Usage:  uint32rgb = RGBA2UInt32(rgbmap)
 
  Argument:   rgbmap - Vector of ColorTypes.RGBA values as 
                       returned by cmap().
@@ -2240,7 +2220,8 @@ for use as a colour map in Winston
 ```
 See also: cmap
 """
-function Base.convert(::Type{Vector{UInt32}}, rgb::Vector{ColorTypes.RGBA{Float64}})
+
+function RGBA2UInt32(rgb::Vector{ColorTypes.RGBA{Float64}})
 
     N = length(rgb)
     uint32rgb = zeros(UInt32, N)
@@ -2287,13 +2268,13 @@ function linearrgbmap(C::Array, N::Int = 256)
         rgbmap[:,n] = C[n] * ramp
     end
 
-    return convert(Array{ColorTypes.RGBA{Float64},1}, rgbmap)
+    return FloatArray2RGBA(rgbmap)
 end
 
 #-------------------------------------------------------------------
 # Convert Nx3 Float64 array to  N array of ColorTypes.RGB{Float64}
 
-function Base.convert(::Type{Array{ColorTypes.RGB{Float64},1}}, cmap::Array{Float64,2})
+function FloatArray2RGB(cmap::Array{Float64,2})
 
     (N,cols) = size(cmap)
     @assert cols == 3  "Color map data must be N x 3"
@@ -2309,7 +2290,7 @@ end
 #-------------------------------------------------------------------
 # Convert Nx3 Float64 array to  N array of ColorTypes.RGBA{Float64}
 
-function Base.convert(::Type{Array{ColorTypes.RGBA{Float64},1}}, cmap::Array{Float64,2})
+function FloatArray2RGBA(cmap::Array{Float64,2})
 
     (N,cols) = size(cmap)
     @assert cols == 3  "Color map data must be N x 3"
@@ -2326,7 +2307,7 @@ end
 #-------------------------------------------------------------------
 # Convert N array of ColorTypes.RGB{Float64} to Nx3 Float64 array 
 
-function Base.convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGB{Float64},1})
+function RGB2FloatArray(rgbmap::Array{ColorTypes.RGBA{Float64},1})
 
     N = length(rgbmap)
 
@@ -2342,7 +2323,7 @@ end
 
 # Convert N array of ColorTypes.RGBA{Float64} to Nx3 Float64 array 
 
-function Base.convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGBA{Float64},1})
+function RGBA2FloatArray(rgbmap::Array{ColorTypes.RGBA{Float64},1})
 
     N = length(rgbmap)
 

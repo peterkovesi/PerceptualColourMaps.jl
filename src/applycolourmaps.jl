@@ -74,7 +74,7 @@ function applycolourmap{T}(imgin::Array{T,2}, cmap::Array{ColorTypes.RGBA{Float6
     @assert rnge[1] < rnge[2] "rnge[1] must be less than rnge[2]"
 
     # Convert cmap to a ncolours x 3 array for convenience
-    rgbmap = convert(Array{Float64,2}, cmap)
+    rgbmap = RGBA2FloatArray(cmap)
 
     img = copy(imgin)
     # Set any Nan entries to rnge[1] so that they will be mapped to the first 
@@ -115,7 +115,7 @@ function applycolourmap{T}(img::Images.AbstractImage{T,2}, cmap, rnge)
 end
 
 function applycolourmap{T<:Real}(img::AbstractArray{T,2}, cmap::Array{Float64, 2}, rnge)
-    return applycolourmap(img, convert(Array{ColorTypes.RGBA{Float64},1}, cmap), rnge)
+    return applycolourmap(img, FloatArray2RGBA(cmap), rnge)
 end
 
 
@@ -164,7 +164,7 @@ function applycolormap{T}(img::Images.AbstractImage{T,2}, cmap, rnge)
 end
 
 function applycolormap{T<:Real}(img::AbstractArray{T,2}, cmap::Array{Float64, 2}, rnge)
-    return applycolourmap(img, convert(Array{ColorTypes.RGBA{Float64},1}, cmap), rnge)
+    return applycolourmap(img, FloatArray2RGBA(cmap), rnge)
 end
 
 

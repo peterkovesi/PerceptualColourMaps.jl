@@ -18,7 +18,7 @@ Function Reference
 * [normalise/normalize](#normalisenormalize) - Normalises image values to 0-1, or to desired mean and variance.
 * [srgb2lab](#srgb2lab) - Convert RGB colour map or RGB image to Lab.
 * [lab2srgb](#lab2srgb) - Convert Lab colour map or Lab image to RGB.
-* [convert](#convert) - Conversions provided by this package.
+* [conversions](#conversions) - Type conversions provided by this package.
 
 ____
 
@@ -791,27 +791,30 @@ point of D65
  Returns:    rgb - A N x 3 array of RGB values or a 3 channel RGB image.
 ```
 
-## convert
-
-The following conversions are provided by the package:
+## conversions
 
 * Convert an array of ColorTypes RGBA values to an array of UInt32 values
 for use as a colour map in Winston
 
 ```
-convert(::Type{UInt32}, rgb::Array{ColorTypes.RGBA{Float64},1})
-```
+uint32map = RGBA2UInt32(RGBAarray)
 
-* Convert Nx3 Float64 array to  N array of ColorTypes.RGB{Float64}
-
-```
-convert(::Type{Array{ColorTypes.RGB{Float64},1}}, cmap::Array{Float64,2})
-convert(::Type{Array{ColorTypes.RGBA{Float64},1}}, cmap::Array{Float64,2})
-```
-
-* Convert N array of ColorTypes.RGB{Float64} to Nx3 Float64 array
+Argument:  RGBAarray - Array of ColorTypes.RGBA values
+Returns:   uint32map - Array of UInt32 values for use as a colour map in Winston
 
 ```
-convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGB{Float64},1})
-convert(::Type{Array{Float64,2}}, rgbmap::Array{ColorTypes.RGBA{Float64},1})
+
+* Convert between Nx3 Float64 array and N array of ColorTypes.RGB{Float64} or ColorTypes.RGBA{Float64}
+
 ```
+RGBarray  = FloatArray2RGB(rgb)
+RGBAarray = FloatArray2RGBA(rgb)
+
+rgb = RGB2FloatArray(RGBarray)
+rgb = RGBA2FloatArray(RGBAarray)
+```
+
+rgb - Nx3 Float64 array of RGB values
+RGBarray  - ColorTypes.RGB{Float64},1}
+RGBAarray - ColorTypes.RGBA{Float64},1}
+

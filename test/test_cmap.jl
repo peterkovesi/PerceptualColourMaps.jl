@@ -31,13 +31,13 @@ dL = gradient(labmap2[:,1])
 
 # linearrgbmap
 rgbmap = linearrgbmap([1,1,1],99)
-rgbmap2 = PerceptualColourMaps.convert(Array{Float64,2},rgbmap)
+rgbmap2 = PerceptualColourMaps.RGBA2FloatArray(rgbmap)
 # check middle colour is [.5 .5 .5]
 @test maximum(abs(rgbmap2[50:50,:] - [0.5 0.5 0.5])) < 1e-6
 
 
 # UInt32colormap
-ui32 = UInt32colormap(cmap("L3"))
+ui32 = RGBA2UInt32(cmap("L3"))
 
 # srgb2lab and lab2srgb
 rgb = [1 0 0
