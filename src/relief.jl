@@ -51,8 +51,8 @@ See also: cmap, applycolourmap
 # April    2014 Original MATLAB version
 # December 2015 Ported to Julia
 
-function relief{T1<:Real,T2<:Real}(img::Array{T1,2}, az::Real=45, el::Real=45, 
-                                   gradscale::Real=1, rgbimg::Array{T2,3}=Array{Float64}(0,0,0))
+function relief(img::Array{T1,2}, az::Real=45, el::Real=45, 
+                gradscale::Real=1, rgbimg::Array{T2,3}=Array{Float64}(0,0,0)) where {T1<:Real,T2<:Real}
 
     (rows, cols) = size(img)
     
@@ -103,9 +103,9 @@ end
     
 
 # Case where a colour map is supplied rather than a RGB img
-function relief{T1<:Real}(img::Array{T1,2}, az::Real, el::Real, 
-                          gradscale::Real, 
-                          rgbmap::Array{ColorTypes.RGB{Float64},1})
+function relief(img::Array{T1,2}, az::Real, el::Real, 
+                gradscale::Real, 
+                rgbmap::Array{ColorTypes.RGB{Float64},1}) where T1<:Real
 
     # Apply colour map to input image and use this as rgbimg
     rgbimg = applycolourmap(img, rgbmap)
@@ -114,9 +114,9 @@ end
 
 
 # Case where a colour map is supplied rather than a RGB img
-function relief{T1<:Real}(img::Array{T1,2}, az::Real, el::Real, 
-                          gradscale::Real, 
-                          rgbmap::Array{ColorTypes.RGBA{Float64},1})
+function relief(img::Array{T1,2}, az::Real, el::Real, 
+                gradscale::Real, 
+                rgbmap::Array{ColorTypes.RGBA{Float64},1}) where T1<:Real
 
     # Apply colour map to input image and use this as rgbimg
     rgbimg = applycolourmap(img, rgbmap)
@@ -129,7 +129,7 @@ end
 #
 # (n1, n2, n3) = surfacenormals(img, gradscale, loggrad)
 
-function surfacenormals{T<:Real}(img::Array{T,2}, gradscale::Real, loggrad::Compat.ASCIIString)
+function surfacenormals(img::Array{T,2}, gradscale::Real, loggrad::String) where T<:Real
 
     loggrad = lowercase(loggrad)
     

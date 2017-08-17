@@ -67,7 +67,7 @@ See also: cmap, applycycliccolourmap, applydivergingcolourmap
 # November  2013 - Original Matlab code
 # November  2015 - Ported to Julia
 
-function applycolourmap{T}(imgin::Array{T,2}, cmap::Array{ColorTypes.RGBA{Float64},1}, rnge::Array)
+function applycolourmap(imgin::Array{T,2}, cmap::Array{ColorTypes.RGBA{Float64},1}, rnge::Array) where T
     
     ncolours = length(cmap)
     @assert ndims(imgin) == 2   "Image must be single channel"
@@ -108,13 +108,13 @@ function applycolourmap(img::AbstractArray, cmap::AbstractArray)
 end
 
 # Case for img::AbstractImage 
-function applycolourmap{T}(img::Images.AbstractImage{T,2}, cmap, rnge)
+function applycolourmap(img::Images.AbstractImage{T,2}, cmap, rnge) where T
     rgbimg = applycolourmap(float(Images.data(img)), cmap, rnge)
     return Images.Image(rgbimg, colordim = 3, colorspace=Images.RGB, 
                         spatialorder = img.properties["spatialorder"])
 end
 
-function applycolourmap{T<:Real}(img::AbstractArray{T,2}, cmap::Array{Float64, 2}, rnge)
+function applycolourmap(img::AbstractArray{T,2}, cmap::Array{Float64, 2}, rnge) where T<:Real
     return applycolourmap(img, FloatArray2RGBA(cmap), rnge)
 end
 
@@ -157,13 +157,13 @@ function applycolormap(img::AbstractArray, cmap::AbstractArray)
 end
 
 # Case for img::AbstractImage 
-function applycolormap{T}(img::Images.AbstractImage{T,2}, cmap, rnge)
+function applycolormap(img::Images.AbstractImage{T,2}, cmap, rnge) where T
     rgbimg = applycolourmap(float(Images.data(img)), cmap, rnge)
     return Images.Image(rgbimg, colordim = 3, colorspace=Images.RGB, 
                         spatialorder = img.properties["spatialorder"])
 end
 
-function applycolormap{T<:Real}(img::AbstractArray{T,2}, cmap::Array{Float64, 2}, rnge)
+function applycolormap(img::AbstractArray{T,2}, cmap::Array{Float64, 2}, rnge) where T<:Real
     return applycolourmap(img, FloatArray2RGBA(cmap), rnge)
 end
 
@@ -210,8 +210,8 @@ arXiv:1509.03700 [cs.GR] 2015.
 
 See also: applycolourmap, linearrgbmap
 """
-function ternaryimage{T<:Real}(img::Array{T,3}; bands::Array = [1, 2, 3], 
-                               histcut::Real = 0.0, RGB::Bool=false)
+function ternaryimage(img::Array{T,3}; bands::Array = [1, 2, 3], 
+                      histcut::Real = 0.0, RGB::Bool=false) where T<:Real
 
     N = 256
     (rows, cols, chan) = size(img)
@@ -250,8 +250,8 @@ function ternaryimage{T<:Real}(img::Array{T,3}; bands::Array = [1, 2, 3],
 end
 
 # Case for img::AbstractImage  ** Conversion of RGB4 FixedPointNumbers images does not work **
-function ternaryimage{T}(img::Images.AbstractImage{T,3}; 
-                         bands::Array = [1, 2, 3], histcut::Real = 0.0, RGB::Bool=false)
+function ternaryimage(img::Images.AbstractImage{T,3}; 
+                      bands::Array = [1, 2, 3], histcut::Real = 0.0, RGB::Bool=false) where T
 
     rgbimg = ternaryimage(float(Images.data(img)), bands=bands, histcut=histcut, RGB=RGB)
     return Images.Image(rgbimg, colordim = 3, colorspace=Images.RGB, spatialorder = img.properties["spatialorder"])
@@ -345,9 +345,9 @@ function applycycliccolourmap(ang::Array{Float64,2}, cmap::Array{ColorTypes.RGBA
 end    
 
 # Case for img::AbstractImage  
-function applycycliccolourmap{T1,T2}(img::Images.AbstractImage{T1,2}, cmap::Array{ColorTypes.RGBA{Float64},1}; 
-                                 amp::Images.AbstractImage{T2,2}=Images.Image(Array{Float64}(0,0)),
-                                 cyclelength::Real=2*pi, modtoblack::Bool=true)
+function applycycliccolourmap(img::Images.AbstractImage{T1,2}, cmap::Array{ColorTypes.RGBA{Float64},1}; 
+                          amp::Images.AbstractImage{T2,2}=Images.Image(Array{Float64}(0,0)),
+                          cyclelength::Real=2*pi, modtoblack::Bool=true) where {T1,T2}
     rgbimg = applycycliccolourmap(float(Images.data(img)), cmap, amp=float(Images.data(amp)), 
                    cyclelength=cyclelength, modtoblack=modtoblack)
     return Images.Image(rgbimg, colordim = 3, colorspace=Images.RGB, spatialorder = img.properties["spatialorder"])
@@ -371,9 +371,9 @@ end
 
 
 # Case for img::AbstractImage  
-function applycycliccolormap{T1,T2}(img::Images.AbstractImage{T1,2}, cmap::Array{ColorTypes.RGBA{Float64},1}; 
-                                 amp::Images.AbstractImage{T2,2}=Images.Image(Array{Float64}(0,0)),
-                                 cyclelength::Real=2*pi, modtoblack::Bool=true)
+function applycycliccolormap(img::Images.AbstractImage{T1,2}, cmap::Array{ColorTypes.RGBA{Float64},1}; 
+                          amp::Images.AbstractImage{T2,2}=Images.Image(Array{Float64}(0,0)),
+                          cyclelength::Real=2*pi, modtoblack::Bool=true) where {T1,T2}
     applycycliccolourmap(img, cmap, amp, cyclelength, modtoblack)
 end
 
