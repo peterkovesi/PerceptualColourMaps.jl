@@ -135,7 +135,7 @@ function surfacenormals(img::Array{T,2}, gradscale::Real, loggrad::String) where
 
     # Compute partial derivatives of z.
     # p = dz/dx, q = dz/dy
-    (p,q) = Images.imgradients(img)
+    (q,p) = Images.imgradients(img, KernelFactors.ando3)
     p = p*gradscale
     q = q*gradscale
 
