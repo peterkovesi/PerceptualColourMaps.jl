@@ -9,7 +9,7 @@ println("testing cmap")
 
 # cmap: Test cmap by calling it with no arguments. This generates a
 # list of all the colour maps and in the process generates them all.
-cmap() 
+cmap()
 
 #=  See if this is what causes Travis to fail...
 # equalisecolourmap: Generate a colour map in Lab space with an uneven
@@ -53,4 +53,3 @@ clab = srgb2lab(rgb)
 crgb = lab2srgb(clab)
 @test maximum(abs(rgb-crgb)) < 1e-1
 @test maximum(abs(lab-clab)) < 1e-1
-

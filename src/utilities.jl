@@ -2,12 +2,12 @@
 
 Copyright (c) 2015 Peter Kovesi
 pk@peterkovesi.com
- 
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, subject to the following conditions:
- 
-The above copyright notice and this permission notice shall be included in 
+
+The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
 The Software is provided "as is", without warranty of any kind.
@@ -28,9 +28,9 @@ export sineramp, circlesineramp
 bbspline - Basic B-spline
 ```
 Usage:  S = bbspline(P, k, N)
- 
+
 Arguments:   P - [dim x Npts] array of control points
-             k - order of spline (>= 2). 
+             k - order of spline (>= 2).
                  k = 2: Linear
                  k = 3: Quadratic, etc
              N - Optional number of points to evaluate along
@@ -44,37 +44,37 @@ See also: pbspline
 # PK Jan 2014
 
 function bbspline(P::Array, k::Int, N::Int = 100)
-    
+
     (dim, np1) = size(P)
     n = np1-1
 
-    @assert k >= 2   "Spline order must be 2 or greater"   
+    @assert k >= 2   "Spline order must be 2 or greater"
     @assert np1 >= k "No of control points must be >= k"
     @assert N >= 2   "Spline must be evaluated at 2 or more points"
 
-    # Set up open uniform knot vector from 0 - 1.  
+    # Set up open uniform knot vector from 0 - 1.
     # There are k repeated knots at each end.
     ti = collect(0:(k+n - 2*(k-1)))'
     ti = ti/ti[end]
     ti = [repmat([ti[1]], 1, k-1)  ti  repmat([ti[end]], 1, k-1)]
- 
+
     nK = length(ti)
-    
+
     # Generate values of t that the spline will be evaluated at
     dt = (ti[end]-ti[1])/(N-1)
     t = collect(ti[1]:dt:ti[end])'
-    
+
     # Build complete array of basis functions.  We maintain two
     # arrays, one storing the basis functions at the current level of
     # recursion, and one storing the basis functions from the previous
     # level of recursion
     Blast = Array{Array{Float64}}(nK-1)
     B = Array{Array{Float64}}(nK-1)
-    
+
     # 1st level of recursive construction
     for i = 1:nK-1
         if ti[i] < ti[i+1]
-            Blast[i] = (t .>= ti[i]) & (t .< ti[i+1]) 
+            Blast[i] = (t .>= ti[i]) & (t .< ti[i+1])
         else
             Blast[i] = zeros(1,N)
         end
@@ -89,16 +89,16 @@ function bbspline(P::Array, k::Int, N::Int = 100)
             else
                 V1 = (t - ti[i])/(ti[i+ki-1] - ti[i]) .* Blast[i]
             end
-            
+
             if (ti[i+ki] - ti[i+1]) < eps()
                 V2 = zeros(1,N)
             else
                 V2 = (ti[i+ki] - t)/(ti[i+ki] - ti[i+1]) .* Blast[i+1]
             end
-            
+
             B[i] = V1 + V2
 
-            # This is the ideal equation that the code above implements            
+            # This is the ideal equation that the code above implements
             # B[i,ki] = (t - ti[i])/(ti[i+ki-1] - ti[i]) .* B[i,ki-1] + ...
             #           (ti[i+ki] - t)/(ti[i+ki] - ti[i+1]) .* B[i+1,ki-1]
         end
@@ -109,29 +109,29 @@ function bbspline(P::Array, k::Int, N::Int = 100)
             B = tmp
         end
     end
-    
+
     # Apply basis functions to the control points
     S = zeros(dim, length(t))
 
     for d = 1:dim, i = 1:np1
         S[d:d,:] += P[d,i]*B[i]
     end
-    
+
     # Set the last point of the spline. This is not evaluated by the code above
     # because the basis functions are defined from ti[i] <= t < ti[i+1]
     S[:,end] = P[:,end]
 
     return S
-end 
+end
 
 #-------------------------------------------------------------------------------
 """
 pbspline - Basic Periodic B-spline
 ```
 Usage:  S = pbspline(P, k, N)
- 
+
 Arguments:   P - [dim x Npts] array of control points
-             k - order of spline (>= 2). 
+             k - order of spline (>= 2).
                  k = 2: Linear
                  k = 3: Quadratic, etc
              N - Optional number of points to evaluate along
@@ -153,23 +153,23 @@ See also: bbspline
 function pbspline(Pin::Array, k::Int, N::Int = 100)
 
     P = copy(Pin)  # Make a copy because we will be altering P
-    
+
     # For a closed spline check if 1st and last control points match.  If not
     # add another control point so that they do match
     if norm(P[:,1] - P[:,end]) > 0.01
         P = [P P[:,1]]
     end
-    
+
     # Now add k - 1 control points that wrap over the first control points
     P = [P P[:,2:2+k-1]]
-    
+
     (dim, np1) = size(P)
     n = np1-1
 
     @assert k >= 2   "Spline order must be 2 or greater"
     @assert np1 >= k "No of control points must be >= k"
     @assert N >= 2   "Spline must be evaluated at 2 or more points"
-    
+
     # Form a uniform sequence. Number of knot points is m + 1 where m = n + k + 1
     ti = collect(0:(n+k+1))/(n+k+1)'
     nK = length(ti)
@@ -180,7 +180,7 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
 
     dt = (tend-tstart)/(N-1)
     t = collect(tstart:dt:tend)'
-    
+
     # Build complete array of basis functions.  We maintain two
     # arrays, one storing the basis functions at the current level of
     # recursion, and one storing the basis functions from the previous
@@ -207,16 +207,16 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
             else
                 V1 = (t - ti[i])/(ti[i+ki-1] - ti[i]) .* Blast[i]
             end
-            
+
             if (ti[i+ki] - ti[i+1]) < eps()
                 V2 = zeros(1,N)
             else
                 V2 = (ti[i+ki] - t)/(ti[i+ki] - ti[i+1]) .* Blast[i+1]
             end
-            
+
             B[i] = V1 + V2
-            
-            #       This is the ideal equation that the code above implements            
+
+            #       This is the ideal equation that the code above implements
             #       B[i,ki] = (t - ti[i])/(ti[i+ki-1] - ti[i]) .* B[i,ki-1] + ...
             #                (ti[i+ki] - t)/(ti[i+ki] - ti[i+1]) .* B[i+1,ki-1]
         end
@@ -227,14 +227,14 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
             B = tmp
         end
     end
-    
+
     # Apply basis functions to the control points
     S = zeros(dim, length(t))
-    
+
     for d = 1:dim, i = 1:np1
         S[d:d,:] += P[d,i]*B[i]
     end
-    
+
     # Finally, because of the knot arrangements, the start of the spline may not
     # be close to the first control point if the spline order is 3 or greater.
     # Normally for a closed spline this is irrelevant.  However for our purpose
@@ -242,14 +242,14 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
     # us.  The simple brute force solution used here is to search through the
     # spline points for the point that is closest to the 1st control point and
     # then rotate the spline points accordingly
-    
+
     distsqrd = zeros(size(S[1,:]))
     for d = 1:dim
         distsqrd += (S[d,:] - P[d,1]).^2
     end
-    
+
     ind = indmin(distsqrd)
-    
+
     return S = circshift(S, [0, -ind+1])
 end
 
@@ -268,7 +268,7 @@ function gaussfilt1d(s::Array, sigma::Real)
     fw = 2*r + 1
 
     # Construct filter
-    f = Float64[exp(-x.^2/(2*sigma)) for x = -r:r] 
+    f = Float64[exp(-x.^2/(2*sigma)) for x = -r:r]
     f = f/sum(f)
 
     sm = zeros(size(s))
@@ -400,7 +400,7 @@ normalise/normalize - Normalises image values to 0-1, or to desired mean and var
 Usage 1:      nimg = normalise(img)
 ```
 Offsets and rescales image so that the minimum value is 0
-and the maximum value is 1.  
+and the maximum value is 1.
 
 ```
 Usage 2:      nimg = normalise(img, reqmean, reqvar)
@@ -410,11 +410,11 @@ Arguments:  img     - A grey-level input image.
             reqvar  - The required variance of the image.
 ```
 Offsets and rescales image so that nimg has mean reqmean and variance
-reqvar.  
+reqvar.
 """
 
 # Normalise 0 - 1
-function normalise(img::Array) 
+function normalise(img::Array)
     n = img - minimum(img)
     return n = n/maximum(n)
 end
@@ -433,7 +433,7 @@ normalize - Normalizes image values to 0-1, or to desired mean and variance
 Usage 1:      nimg = normalize(img)
 ```
 Offsets and rescales image so that the minimum value is 0
-and the maximum value is 1.  
+and the maximum value is 1.
 ```
 Usage 2:      nimg = normalize(img, reqmean, reqvar)
 
@@ -442,10 +442,10 @@ Arguments:  img     - A grey-level input image.
             reqvar  - The required variance of the image.
 ```
 Offsets and rescales image so that nimg has mean reqmean and variance
-reqvar.  
+reqvar.
 """
 
-function normalize(img::Array) 
+function normalize(img::Array)
     return normalise(img)
 end
 
@@ -467,7 +467,7 @@ have the overall effect of darkening the rest of the image after
 rescaling.
 
 ```
-Usage: 
+Usage:
 1)   newimg = histtruncate(img, lHistCut, uHistCut)
 2)   newimg = histtruncate(img, HistCut)
 
@@ -498,22 +498,22 @@ See also: normalise
 # September 2014 - Default for uHistCut + cleanup
 
 function  histtruncate(img::Array, lHistCut::Real, uHistCut::Real)
-    
+
     if lHistCut < 0 || lHistCut > 100 || uHistCut < 0 || uHistCut > 100
 	error("Histogram truncation values must be between 0 and 100")
     end
-    
+
     if ndims(img) > 2
 	error("histtruncate only defined for grey scale images")
     end
 
-    newimg = copy(img)    
+    newimg = copy(img)
     sortv = sort(newimg[:])   # Generate a sorted array of pixel values.
 
     # Any NaN values will end up at the end of the sorted list. We
     # need to ignore these.
     N = sum(!isnan(sortv))  # Number of non NaN values.
-    
+
     # Compute indicies corresponding to specified upper and lower fractions
     # of the histogram.
     lind = floor(Int, 1 + N*lHistCut/100)
@@ -525,7 +525,7 @@ function  histtruncate(img::Array, lHistCut::Real, uHistCut::Real)
     # Adjust image
     newimg[newimg .< low_val] = low_val
     newimg[newimg .> high_val] = high_val
-    
+
     return newimg
 end
 
@@ -536,12 +536,12 @@ end
 
 
 #----------------------------------------------------------------------
-"""          
+"""
 sineramp  - Generates sine on a ramp colour map test image
 
 The test image consists of a sine wave superimposed on a ramp function The
 amplitude of the sine wave is modulated from its full value at the top of the
-image to 0 at the bottom. 
+image to 0 at the bottom.
 
 The image is useful for evaluating the effectiveness of different colour maps.
 Ideally the sine wave pattern should be equally discernible over the full
@@ -555,18 +555,18 @@ significant features.
 Usage: img = sineramp(sze, amp, wavelen, p)
        img = sineramp()
 
-Arguments:     sze - (rows, cols) specifying size of test image.  
+Arguments:     sze - (rows, cols) specifying size of test image.
                      Defaults to (256 512)  Note the number of columns is
                      nominal and will be ajusted so that there are an
                      integer number of sine wave cycles across the image.
                amp - Amplitude of sine wave. Defaults to 12.5
            wavelen - Wavelength of sine wave in pixels. Defaults to 8.
-                 p - Power to which the linear attenuation of amplitude, 
+                 p - Power to which the linear attenuation of amplitude,
                      from top to bottom, is raised.  For no attenuation use
                      p = 0.  For linear attenuation use a value of 1.  For
                      contrast sensitivity experiments use larger values of
-                     p.  The default value is 2. 
-``` 
+                     p.  The default value is 2.
+```
 The ramp function that the sine wave is superimposed on is adjusted slightly
 for each row so that each row of the image spans the full data range of 0 to
 255.  Thus using a large sine wave amplitude will result in the ramp at the
@@ -578,7 +578,7 @@ To start with try
 ```
   > img = sineramp()
 ```
-This is equivalent to 
+This is equivalent to
 
 ```
   > img = sineramp((256 512), 12.5, 8, 2)
@@ -587,7 +587,7 @@ View it under 'gray' then try the 'jet', 'hsv', 'hot' etc colour maps.  The
 results may cause you some concern!
 
 If you are wishing to evaluate a cyclic colour map, say hsv, it is suggested
-that you use the test image generated by circlesineramp().  
+that you use the test image generated by circlesineramp().
 
 See source code comments for more details on the default wavelength
 and amplitude.
@@ -622,7 +622,7 @@ that can hide features of this magnitude.
 # ** Should I make this function return UInt8 values ?**
 
 function sineramp(sze=(256,512), amp=12.5, wavelen=8, p=2)
-    
+
     # Adjust width of image so that we have an integer number of cycles of
     # the sinewave.  This is helps should one be using the test image to
     # evaluate a cyclic colour map.  However you will still see a slight
@@ -631,19 +631,19 @@ function sineramp(sze=(256,512), amp=12.5, wavelen=8, p=2)
     (rows,cols) = sze
     cycles = round(cols/wavelen)
     cols = cycles*wavelen
-    
+
     # Sine wave
     x = collect(0:cols-1)'
     fx = amp*sin( 1.0/wavelen * 2*pi*x)
-    
+
     # Vertical modulating function
     A = (collect((rows-1):-1:0)'/(rows-1)).^float(p)
     img = A'*fx
-    
+
     # Add ramp
     ramp = [c/(cols-1) for r = 1:rows, c = 0:(cols-1)]
     img = img + ramp*(255.0 - 2*amp)
-    
+
     # Now normalise each row so that it spans the full data range from 0 to 255.
     # Again, this is important for evaluation of cyclic colour maps though a
     # small cyclic discontinuity will remain at the top of the test image.
@@ -655,7 +655,7 @@ function sineramp(sze=(256,512), amp=12.5, wavelen=8, p=2)
 end
 
 #----------------------------------------------------------------------
-"""           
+"""
 circlesineramp - Generates a test image for evaluating cyclic colour maps
 
 ```
@@ -666,11 +666,11 @@ Arguments:     sze - Size of test image.  Defaults to 512x512.
                amp - Amplitude of sine wave. Defaults to pi/10
            wavelen - Wavelength of sine wave at half radius of the
                      circular test image. Defaults to 8 pixels.
-                 p - Power to which the linear attenuation of amplitude, 
+                 p - Power to which the linear attenuation of amplitude,
                      from outside edge to centre, is raised.  For no
                      attenuation use p = 0.  For linear attenuation use a
                      value of 1.  The default value is 2, quadratic
-                     attenuation. 
+                     attenuation.
               hole - Boolean flag indicating whether the test image should have
                      a 'hole' in its centre.  The default is true, to have a
                      hole, this removes the distraction of the orientation
@@ -719,7 +719,7 @@ See also: applycycliccolourmap, sineramp, chirplin, chirpexp, equalisecolourmap,
 #                 being specified directly.
 
 function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
-    
+
     # Set values for inner and outer radii of test pattern
     maxr = sze/2 * 0.9
     if hole
@@ -727,20 +727,20 @@ function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
     else
         minr = 0
     end
-    
+
     # Determine number of cycles to achieve desired wavelength at half radius
     meanr = (maxr + minr)/2
     circum = 2*pi*meanr
     cycles = round(circum/wavelen)
-    
+
     # Angles are +ve anticlockwise and mod 2*pi
     (x,y) = meshgrid((0:sze-1)-sze/2)
-    theta = mod(atan2(-y,x), 2*pi)  
+    theta = mod(atan2(-y,x), 2*pi)
     rad = sqrt(x.^2 + y.^2)
-    
+
     # Normalise radius so that it varies 0-1 over minr to maxr
     rad = (rad-minr)/(maxr-minr)
-    
+
     # Form the image
     img = amp*rad.^float(p) .* sin(cycles*theta) + theta
 
@@ -750,11 +750,11 @@ function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
 
     # 'Nanify' values outside normalised radius values of 0-1
     alpha = ones(size(img))
-    img[rad .> 1] = NaN  
+    img[rad .> 1] = NaN
     alpha[rad .> 1] = 0
 
     if hole
-        img[rad .< 0] = NaN 
+        img[rad .< 0] = NaN
         alpha[rad .< 0] = 0
     end
 
@@ -769,8 +769,8 @@ Usage: (x, y) = meshgrid(xrange, yrange)
 
        (x, y) = meshgrid(xyrange)
 
-Arguments: 
-      xrange, yrange - Ranges or vectors defining the values to 
+Arguments:
+      xrange, yrange - Ranges or vectors defining the values to
                        be placed in the cartesian grid.
 
              xyrange - Range of vector that is to be used for both x and y.
@@ -807,7 +807,7 @@ end
 
 # Vector version
 function meshgrid(xrange::Vector, yrange::Vector)
-    
+
     rows = length(yrange)
     cols = length(xrange)
 
@@ -816,4 +816,3 @@ function meshgrid(xrange::Vector, yrange::Vector)
 
     return x,y
 end
-

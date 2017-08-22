@@ -63,7 +63,7 @@ Arguments for Usage 1 and 2:
                     as designed. However, depending on your application you may
                     want a colour map with reduced chroma/saturation values.
                     You can use values greater than 1 however gamut clipping is
-                    likely to occur giving rise to artifacts in the colour map. 
+                    likely to occur giving rise to artifacts in the colour map.
            N::Int - Number of values in the colour map. Defaults to 256.
       shift::Real - Fraction of the colour map length N that the colour map is
                     to be cyclically rotated, may be negative.  (Should only be
@@ -72,14 +72,14 @@ Arguments for Usage 1 and 2:
 diagnostics::Bool - If true displays various diagnostic plots. Note the
                     diagnostic plots will be for the map _before_ any cyclic
                     shifting or reversing is applied. Defaults to false.
- returnname::Bool - If true the function returns a tuple of the colourmap, its 
+ returnname::Bool - If true the function returns a tuple of the colourmap, its
                     name and its description  (colourmap, name, description)
                     The default value is false, just the colourmap is returned.
 
 Returns:
           map - Array of ColorTypes.RGBA{Float64,1} giving the rgb colour map.
 
-     If returnname=true the function additionally returns 
+     If returnname=true the function additionally returns
          name - A string giving a nominal name for the colour map
          desc - A string giving a brief description of the colour map
 ```
@@ -116,7 +116,7 @@ Winston:
 
 ```
 > using Winston
-> colormap(cmap("R1"));    # Set Winston's colour map to the cmap() rainbow 
+> colormap(cmap("R1"));    # Set Winston's colour map to the cmap() rainbow
                            # colour map first.
 > imagesc(sr);             # Then display the image
 
@@ -126,7 +126,7 @@ Plots:
 
 ```
 > using Plots
-> y=rand(100); 
+> y=rand(100);
 > scatter(y, zcolor=y, marker=ColorGradient(cmap("R3")));
 ```
 
@@ -818,4 +818,3 @@ RGBarray  - ColorTypes.RGB{Float64},1}
 RGBAarray - ColorTypes.RGBA{Float64},1}
 
 ```
-

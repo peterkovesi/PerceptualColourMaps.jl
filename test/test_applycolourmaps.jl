@@ -35,4 +35,3 @@ for n = 1:3
 end
 rgbimg = ternaryimage(cimg, bands=bands, histcut=histcut)
 rgbimg = ternaryimage(cimg, bands=bands, histcut=histcut, RGB=false)
-
