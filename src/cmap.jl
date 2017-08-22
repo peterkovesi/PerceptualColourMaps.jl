@@ -1508,13 +1508,13 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     # Compute mean chroma of colour map for use in the name construction
     lab = srgb2lab(map)
-    meanchroma = sum(sqrt(sum(lab[:,2:3].^2, 2)))/N
+    meanchroma = sum(sqrt.(sum(lab[:,2:3].^2, 2)))/N
 
     # Construct lightness range description
     if uppercase(CM.colourspace) == "LAB"  # Use the control points
         L = CM.colpts[:,1]
     else  # For RGB use the converted CIELAB values
-        L = round(lab[:,1])
+        L = round.(lab[:,1])
     end
     minL = minimum(L)
     maxL = maximum(L)
@@ -1747,7 +1747,7 @@ function equalisecolourmap(rgblab::AbstractString, cmap::Array{Float64,2},
 
     if rgblab == "RGB" && (maximum(cmap) > 1.01 || minimum(cmap) < -0.01)
         error("If map is RGB values should be in the range 0-1")
-    elseif rgblab == "LAB" && maximum(abs(cmap)) < 10
+    elseif rgblab == "LAB" && maximum(abs.(cmap)) < 10
         error("If map is LAB magnitude of values are expected to be > 10")
     end
 
@@ -2060,7 +2060,7 @@ function cie76(L::Array, a::Array, b::Array, W::Array)
     da[1] = a[2] - a[1];  da[end] = a[end] - a[end-1]
     db[1] = b[2] - b[1];  db[end] = b[end] - b[end-1]
 
-    return deltaE = sqrt(W[1]*dL.^2 + W[2]*da.^2 + W[3]*db.^2)
+    return deltaE = sqrt.(W[1]*dL.^2 + W[2]*da.^2 + W[3]*db.^2)
 end
 
 #----------------------------------------------------------------------------

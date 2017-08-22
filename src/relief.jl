@@ -155,7 +155,7 @@ function surfacenormals(img::Array{T,2}, gradscale::Real, loggrad::String) where
 
     # Generate surface unit normal vectors. Components stored in n1, n2
     # and n3
-    mag = sqrt(1 + p.^2 + q.^2)
+    mag = sqrt.(1 + p.^2 + q.^2)
     n1 = -p./mag
     n2 = -q./mag
     n3 =  1./mag

@@ -74,7 +74,7 @@ function bbspline(P::Array, k::Int, N::Int = 100)
     # 1st level of recursive construction
     for i = 1:nK-1
         if ti[i] < ti[i+1]
-            Blast[i] = (t .>= ti[i]) & (t .< ti[i+1])
+            Blast[i] = (t .>= ti[i]) .& (t .< ti[i+1])
         else
             Blast[i] = zeros(1,N)
         end
@@ -191,7 +191,7 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
     # 1st level of recursive construction
     for i = 1:nK-1
         if t[i] < ti[i+1]
-            Blast[i] = (t .>= ti[i]) & (t .< ti[i+1])
+            Blast[i] = (t .>= ti[i]) .& (t .< ti[i+1])
         else
             Blast[i] = zeros(1,N)
         end
@@ -512,7 +512,7 @@ function  histtruncate(img::Array, lHistCut::Real, uHistCut::Real)
 
     # Any NaN values will end up at the end of the sorted list. We
     # need to ignore these.
-    N = sum(!isnan(sortv))  # Number of non NaN values.
+    N = sum(.!(isnan.(sortv)))  # Number of non NaN values.
 
     # Compute indicies corresponding to specified upper and lower fractions
     # of the histogram.
@@ -634,7 +634,7 @@ function sineramp(sze=(256,512), amp=12.5, wavelen=8, p=2)
 
     # Sine wave
     x = collect(0:cols-1)'
-    fx = amp*sin( 1.0/wavelen * 2*pi*x)
+    fx = amp*sin.( 1.0/wavelen * 2*pi*x)
 
     # Vertical modulating function
     A = (collect((rows-1):-1:0)'/(rows-1)).^float(p)
@@ -735,18 +735,18 @@ function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
 
     # Angles are +ve anticlockwise and mod 2*pi
     (x,y) = meshgrid((0:sze-1)-sze/2)
-    theta = mod(atan2(-y,x), 2*pi)
-    rad = sqrt(x.^2 + y.^2)
+    theta = mod.(atan2.(-y,x), 2*pi)
+    rad = sqrt.(x.^2 + y.^2)
 
     # Normalise radius so that it varies 0-1 over minr to maxr
     rad = (rad-minr)/(maxr-minr)
 
     # Form the image
-    img = amp*rad.^float(p) .* sin(cycles*theta) + theta
+    img = amp*rad.^float(p) .* sin.(cycles*theta) + theta
 
     # Ensure all values are within 0-2*pi so that a simple default display
     # with a cyclic colour map will render the image correctly.
-    img = mod(img, 2*pi)
+    img = mod.(img, 2*pi)
 
     # 'Nanify' values outside normalised radius values of 0-1
     alpha = ones(size(img))

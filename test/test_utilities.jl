@@ -38,7 +38,7 @@ x = [0, 2, 7]
 y = 2*x
 xi = [1.1, 0.5, 6]
 yi = interp1(x,y,xi)
-@test maximum(abs(yi - 2*xi) .< eps())
+@test maximum(abs.(yi - 2*xi) .< eps())
 
 # normalise
 a = rand(5,3)
@@ -64,10 +64,10 @@ maxval = maximum(htimg)
 # Check that the number of saturated pixels at each extreme is
 # approximately lHistCut and uHistCut. Note some integer rounding has
 # to occur.
-v = find(abs(htimg-minval).<eps())
+v = find(abs.(htimg-minval).<eps())
 @test abs(length(v)/(rows*cols) * 100 - lHistCut) < 1
 
-v = find(abs(htimg-maxval).<eps())
+v = find(abs.(htimg-maxval).<eps())
 @test abs(length(v)/(rows*cols) * 100 - uHistCut) < 1
 
 # sineramp

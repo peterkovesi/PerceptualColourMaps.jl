@@ -80,11 +80,11 @@ function applycolourmap(imgin::Array{T,2}, cmap::Array{ColorTypes.RGBA{Float64},
     # Set any Nan entries to rnge[1] so that they will be mapped to the first
     # colour in the colour map without an error being thrown.  Later all NaN
     # regions are set to black.
-    mask = isnan(img)
+    mask = isnan.(img)
     img[mask] = rnge[1]
 
     # Convert image values to integers that can be used to index into colourmap
-    rimg = round(Int16, (img-rnge[1])/(rnge[2]-rnge[1]) * (ncolours-1) ) + 1
+    rimg = round.(Int16, (img-rnge[1])/(rnge[2]-rnge[1]) * (ncolours-1) ) + 1
 
     # Clamp any out of range values (note the values specified in range[] may
     # be well inside the range of values in the image)
@@ -323,7 +323,7 @@ function applycycliccolourmap(ang::Array{Float64,2}, cmap::Array{ColorTypes.RGBA
     # normal 'linear' data one cannot apply shifts and/or rescale values to
     # normalise them.  The raw angular data values have to be respected.
 
-    angmod = mod(ang, cyclelength)   # Ensure data values are within range 0 - cyclelength
+    angmod = mod.(ang, cyclelength)   # Ensure data values are within range 0 - cyclelength
     rgbimg = applycolourmap(angmod, cmap, [0, cyclelength])
 
     if !isempty(amp)   # Display image with rgb values modulated by amplitude
