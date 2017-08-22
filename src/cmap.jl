@@ -37,7 +37,7 @@ type colourmapdef
     desc::String
     colourspace::String
     colpts::Array{Float64,2}
-    splineorder::Int64
+    splineorder::Int
     formula::String
     W::Array{Float64,1}
     sigma::Float64
