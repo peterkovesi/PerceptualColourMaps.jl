@@ -61,6 +61,8 @@ Peter Kovesi
 """
 module PerceptualColourMaps
 
+using Images
+
 include("cmap.jl")
 include("applycolourmaps.jl")
 include("viewlabspace.jl")
