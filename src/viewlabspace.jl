@@ -2,12 +2,12 @@
 
 Copyright (c) 2015 Peter Kovesi
 pk@peterkovesi.com
- 
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, subject to the following conditions:
- 
-The above copyright notice and this permission notice shall be included in 
+
+The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
 The Software is provided "as is", without warranty of any kind.
@@ -46,7 +46,7 @@ See also: colourmappath, cmap
 # December 2015  Ported from MATLAB to Julia but loses interactivity...
 
 function viewlabspace(L=50, figNo=1)
-    
+
     # Define some reference colours in rgb
     rgb = [1 0 0
            0 1 0
@@ -54,43 +54,43 @@ function viewlabspace(L=50, figNo=1)
            1 1 0
            0 1 1
            1 0 1]
-    
+
     colours = ["red    "
                "green  "
                "blue   "
                "yellow "
                "cyan   "
                "magenta"]
-    
+
     # ... and convert them to lab
     labv = srgb2lab(rgb)
 
     # Obtain cylindrical coordinates in lab space
     labradius = sqrt(labv[:,2].^2+labv[:,3].^2)
     labtheta = atan2(labv[:,3], labv[:,2])
-    
+
     # Define a*b* grid for image
     scale = 2;
     (a, b) = meshgrid(-127:1/scale:127)
     (rows,cols) = size(a)
-    
+
     # Scale and offset lab coords to fit image coords
     labc = zeros(size(labv))
     labc[:,1] = round(labv[:,1])
     labc[:,2] = round(scale*labv[:,2] + cols/2)
     labc[:,3] = round(scale*labv[:,3] + rows/2)
-    
+
     # Print out lab values
     labv = round(labv)
     @printf("\nCoordinates of standard colours in L*a*b* space\n\n");
     for n = 1:length(colours)
         @printf("%s  L%3d   a %4d  b %4d    angle %4.1f  radius %4d\n",
-                colours[n], labv[n,1], labv[n,2], labv[n,3],  
+                colours[n], labv[n,1], labv[n,2], labv[n,3],
                 labtheta[n], round(labradius[n]))
     end
-    
+
     @printf("\n\n")
-    
+
     # Generate axis tick values
     tickval = [-100, -50, 0, 50, 100]
     tickcoords = scale*tickval + cols/2
@@ -116,12 +116,12 @@ function viewlabspace(L=50, figNo=1)
         end
     end
 
-end    
+end
 
 #--------------------------------------------------------
 
 function renderlabslice(L, a, b, figNo, labv, labc, colours)
-    
+
     # Build image in lab space
     (rows,cols) = size(a)
 
@@ -132,10 +132,10 @@ function renderlabslice(L, a, b, figNo, labv, labc, colours)
 
     # Generate rgb values from lab
     rgb = lab2srgb(lab)
-    
+
     # Invert to reconstruct the lab values
     lab2 = srgb2lab(rgb)
-    
+
     # Where the reconstructed lab values differ from the specified values is
     # an indication that we have gone outside of the rgb gamut.  Apply a
     # mask to the rgb values accordingly
@@ -144,7 +144,7 @@ function renderlabslice(L, a, b, figNo, labv, labc, colours)
     for n = 1:3
         rgb[:,:,n] = rgb[:,:,n].*(mask.<2)  # tolerance of 2
     end
-    
+
     figure(figNo)
     imshow(rgb, origin="lower", aspect="equal")
     title(@sprintf("Lab space:  Lightness %d", L))
@@ -159,21 +159,20 @@ function renderlabslice(L, a, b, figNo, labv, labc, colours)
 
     xlabel("a*")
     ylabel("b*")
-    
-    hold(true), 
+
+    hold(true),
     plot(cols/2, rows/2, "r+")   # Centre point for reference
-    
+
     # Plot reference colour positions
     for n = 1:length(colours)
         plot(labc[n,2], labc[n,3], "w+")
-        text(labc[n,2], labc[n,3], 
+        text(labc[n,2], labc[n,3],
              @sprintf("   %s\n  %d %d %d  ",colours[n],
                      labv[n,1], labv[n,2], labv[n,3]),
              color = [1, 1, 1])
 
     end
-    
+
     hold(false)
 
 end
-

@@ -9,7 +9,7 @@ println("testing cmap")
 
 # cmap: Test cmap by calling it with no arguments. This generates a
 # list of all the colour maps and in the process generates them all.
-cmap() 
+cmap()
 
 #=  See if this is what causes Travis to fail...
 # equalisecolourmap: Generate a colour map in Lab space with an uneven
@@ -33,7 +33,7 @@ dL = gradient(labmap2[:,1])
 rgbmap = linearrgbmap([1,1,1],99)
 rgbmap2 = PerceptualColourMaps.RGBA2FloatArray(rgbmap)
 # check middle colour is [.5 .5 .5]
-@test maximum(abs(rgbmap2[50:50,:] - [0.5 0.5 0.5])) < 1e-6
+@test maximum(abs.(rgbmap2[50:50,:] - [0.5 0.5 0.5])) < 1e-6
 
 
 # UInt32colormap
@@ -51,6 +51,5 @@ lab = [ 53.2377   80.1029   67.2144
 
 clab = srgb2lab(rgb)
 crgb = lab2srgb(clab)
-@test maximum(abs(rgb-crgb)) < 1e-1
-@test maximum(abs(lab-clab)) < 1e-1
-
+@test maximum(abs.(rgb-crgb)) < 1e-1
+@test maximum(abs.(lab-clab)) < 1e-1

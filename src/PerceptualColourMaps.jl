@@ -9,7 +9,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in 
+The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
 The Software is provided "as is", without warranty of any kind.
@@ -23,7 +23,7 @@ PK October 2015
 
 Perceptually Uniform Colour maps
 
-Peter Kovesi  
+Peter Kovesi
 
 [peterkovesi.com](http://peterkovesi.com)
 
@@ -61,8 +61,7 @@ Peter Kovesi
 """
 module PerceptualColourMaps
 
-using Compat
-import Compat.ASCIIString
+using Images
 
 include("cmap.jl")
 include("applycolourmaps.jl")
@@ -71,4 +70,3 @@ include("relief.jl")
 include("utilities.jl")
 
 end  # module
-
