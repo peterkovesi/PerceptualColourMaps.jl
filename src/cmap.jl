@@ -90,6 +90,15 @@ Arguments for Usage 1 and 2:
            "R1" - "R3"   for rainbow maps
            "I1" - "I3"   for isoluminant maps
 
+  labels for generating maps for the colour blind:
+           "CBL1"  - "CBL4" Linear maps for protanopic and deuteranopic viewers.
+           "CBD1"  - "CBD2" Diverging maps for protanopic and deuteranopic viewers.
+           "CBC1"  - "CBC2" Cyclic maps for protanopic and deuteranopic viewers.
+           "CBTL1" - "CBTL4" Linear maps for tritanopic viewers.
+           "CBTD1" - Diverging map for tritanopic viewers.
+           "CBTC1" - "CBTC2" Cyclic maps for tritanopic viewers.
+
+
  Some colour maps have alternate labels for convenience and readability.
 
    map = cmap("L1")  or map = cmap("grey")  will produce a linear grey map.
@@ -297,6 +306,16 @@ end
 
 function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
               reverse::Bool = false, diagnostics::Bool = false, returnname::Bool = false)
+
+
+    # Definitions of key angles in Lab space for defining colours in colour
+    # blind colour spaces. Angles are in degrees.
+    yellow575 =  92.62  # For protanopic and deuteranopic colour space.
+    blue475   = -79.27 
+
+    red660  =   32.36   # For tritanopic colour space.
+    cyan485 = -138.73
+
 
     I = uppercase(I)  # This means you must use uppercase keys in the dictionary
 
@@ -1111,6 +1130,263 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 0))
+
+
+    #---------------------------------------------------------------------------  
+    #= 
+    Colour Maps for the Colour Blind
+    Protanopic / Deuteranopic colour maps
+     
+    The Protanopic / Deuteranopic colour space is represented by two planes.
+    One plane is defined by the neutral axis and the colour point at yellow
+    575nm, and the other defined by the neutral axis and the colour point at
+    blue 475nm.
+    Hue angles in a,b space of the key colours common to Protanopic/Deuteranopic
+    and Trichromatic viewers are:
+    yellow 575nm =  1.6165 radians,  92.62 degrees
+    blue   475nm = -1.3835 radians, -79.27 degrees
+    =#
+     
+    # Linear/diverging map for Protanopic/Deuteranopic viewers.  The
+    # symmetry requirements for diverging maps means that the colours
+    # are not as saturated as one would like. However this map works
+    # better than CBL2.
+    push!(cmapdef, "CBL1" =>
+          newcolourmapdef(desc = "Linear/diverging map for Protanopic/Deuteranopic viewers",
+                          attributeStr = "linear-diverging-protanopic-deuteranopic",
+                          hueStr = "kbjyw",
+                          colourspace = "LAB",
+                          colpts = [5 0 0
+                                    28 ch2ab(61, blue475)
+                                    50 0 0
+                                    72 ch2ab(61, yellow575) 
+                                    95 0 0],
+                          splineorder = 3,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
+
+    # Linear map with maximal chroma for Protanopic/Deuteranopic
+    # viewers.  Does not work as well as one would hope.  The colours
+    # are too uneven.
+    push!(cmapdef, "CBL2" =>
+          newcolourmapdef(desc = "Linear map with maximal chroma for Protanopic/Deuteranopic viewers",
+                          attributeStr = "linear-protanopic-deuteranopic",
+                          hueStr = "kbw",
+                          colourspace = "LAB",
+                          colpts = [5 0 0
+                                    20 ch2ab(30, blue475)
+                                    58 ch2ab(69, blue475)
+                                    68 0 0
+                                    85 ch2ab(98, yellow575)
+                                    96 ch2ab(5, yellow575)
+                                    98 0 0],
+                          splineorder = 2;
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 9))
+      
+    # Linear map up the blue edge of the colour space
+    push!(cmapdef, "CBL3" =>
+          newcolourmapdef(desc = "Linear blue map for Protanopic/Deuteranopic viewers",
+                          attributeStr = "linear-protanopic-deuteranopic",
+                          hueStr = "kbw",
+                          colourspace = "LAB",
+                          colpts = [5 0 0
+                                    56 ch2ab(68, blue475)
+                                    95 0 0],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0 ,0],
+                          sigma = 9))
+
+    # Linear map up the yellow edge of the colour space
+    push!(cmapdef, "CBL4" =>
+          newcolourmapdef(desc = "Linear yellow map for Protanopic/Deuteranopic viewers",
+                          attributeStr = "linear-protanopic-deuteranopic",
+                          hueStr = "kyw",
+                          colourspace = "LAB",
+                          colpts = [5 0 0
+                                    25 ch2ab(34, yellow575)
+                                    88 ch2ab(88, yellow575)
+                                    95 ch2ab(5, yellow575)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 9))
+      
+    # Diverging map blue-white-yellow.  Works well.
+    push!(cmapdef, "CBD1" =>
+          newcolourmapdef(desc = "Diverging map blue-white-yellow",
+                          attributeStr = "diverging-protanopic-deuteranopic",
+                          hueStr = "bwy",
+                          colourspace = "LAB",
+                          colpts = [60 ch2ab(63, blue475)
+                                    95 0 0
+                                    60 ch2ab(63, yellow575)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 5))
+
+    #  Diverging-linear map blue-grey-yellow
+    push!(cmapdef, "CBD2" =>
+          newcolourmapdef(desc = "Diverging-linear map blue-grey-yellow",
+                          attributeStr = "diverging-linear-protanopic-deuteranopic",
+                          hueStr = "bjy",
+                          colourspace = "LAB",
+                          colpts = [57 ch2ab(67, blue475)
+                                    73 0 0
+                                    89 ch2ab(67, yellow575)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 5))
+      
+    # 4-phase cyclic map blue-white-yellow-black
+    push!(cmapdef, "CBC1" =>
+          newcolourmapdef(desc = "4-phase cyclic map blue-white-yellow-black",
+                          attributeStr = "cyclic-protanopic-deuteranopic",
+                          hueStr = "bwyk",
+                          colourspace = "LAB",
+                          colpts = [56 ch2ab(61, blue475)
+                                    96 0 0
+                                    56 ch2ab(61, yellow575)
+                                    16 0 0],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 5))
+
+    # 2-phase cyclic map white-yellow-white-blue
+    push!(cmapdef, "CBC2" =>
+          newcolourmapdef(desc = "2-phase cyclic map white-yellow-white-blue",
+                          attributeStr = "cyclic-protanopic-deuteranopic",
+                          hueStr = "wywb",
+                          colourspace = "LAB",
+                          colpts = [96 0 0
+                                    55 ch2ab(68, yellow575)
+                                    96 0 0
+                                    55 ch2ab(68, blue475)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 5))
+      
+    ## Tritanopic colour maps
+    # Hue angles in a,b space of the key colours common to Tritanopic
+    # and Trichromatic viewers.
+    # red  660nm  0.5648 radians,   32.36 degrees
+    # cyan 485nm -2.4213 radians, -138.73 degrees
+
+    # Tritanopic linear map with maximal chroma
+    push!(cmapdef, "CBTL1" =>
+          newcolourmapdef(desc = "Tritanopic linear map with maximal chroma",
+                          attributeStr = "linear-tritanopic",
+                          hueStr = "krjcw",
+                          colourspace = "LAB",
+                          colpts = [5 0 0
+                                    20 ch2ab(50, red660)
+                                    56 ch2ab(95, red660)
+                                    78 ch2ab(52, cyan485)
+                                    98 0 0],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 9))
+     
+    # Tritanopic linear map, can also be used as a diverging
+    # map. However the symmetry requirements of a diverging
+    # map results in colours of lower chroma
+    push!(cmapdef, "CBTL2" =>
+          newcolourmapdef(desc = "Tritanopic linear map, can also be used as a diverging map",
+                          attributeStr = "linear-diverging-tritanopic",
+                          hueStr = "krjcw",
+                          colourspace = "LAB",
+                          colpts = [5 0 0
+                                    25 ch2ab(58, red660)
+                                    50 0 0
+                                    75 ch2ab(58, cyan485)
+                                    95 0 0],
+                          splineorder = 3,
+                          W = [1, 0, 0],
+                          formula = "CIE76",
+                          sigma = 0))
+
+    # Linear map up the blue green edge of the colour space
+    push!(cmapdef, "CBTL3" =>
+          newcolourmapdef(desc = "Tritanopic linear blue map",
+                          attributeStr = "linear-tritanopic",
+                          hueStr = "kcw",
+                          colourspace = "LAB",
+                          colpts = [5 0 0
+                                    70 ch2ab(40, cyan485)
+                                    85 ch2ab(40, cyan485)
+                                    95 0 0],
+                          splineorder = 3,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
+
+    # Linear map up the red edge of the colour space
+    push!(cmapdef, "CBTL4" =>
+          newcolourmapdef(desc = "Tritanopic linear red/heat map",
+                          attributeStr = "linear-tritanopic",
+                          hueStr = "krw",
+                          colourspace = "LAB",
+                          colpts = [5 0 0
+                                    45 ch2ab(100, red660)
+                                    70 ch2ab(50, red660)
+                                    95 0 0],
+                          splineorder = 3,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
+
+    # Tritanopic diverging map
+    push!(cmapdef, "CBTD1" =>
+          newcolourmapdef(desc = "Tritanopic diverging map",
+                          attributeStr = "diverging-tritanopic",
+                          hueStr = "cwr",
+                          colourspace = "LAB",
+                          colpts = [75 ch2ab(39, cyan485)
+                                    98 0 0
+                                    75 ch2ab(39, red660)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 5))
+
+    # 4-phase tritanopic cyclic map
+    push!(cmapdef, "CBTC1" =>
+          newcolourmapdef(desc = "4-phase tritanopic cyclic map",
+                          attributeStr = "cyclic-tritanopic",
+                          hueStr = "cwrk",
+                          colourspace = "LAB",
+                          colpts = [70 ch2ab(39, cyan485)
+                                    100 0 0
+                                    70 ch2ab(39, red660)
+                                    40 0 0],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 5))
+
+    # 2-phase tritanopic cyclic map
+    push!(cmapdef, "CBTC2" =>
+          newcolourmapdef(desc = "2-phase tritanopic cyclic map",
+                          attributeStr = "cyclic-tritanopic",
+                          hueStr = "wrwc",
+                          colourspace = "LAB",
+                          colpts = [100 0 0   
+                                    70 ch2ab(41, red660)
+                                    100 0 0
+                                    70 ch2ab(41, cyan485)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 5))
+
 
 
     #-----------------------------------------------------------------------------
