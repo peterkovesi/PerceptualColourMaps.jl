@@ -11,16 +11,21 @@ PerceptualColourMaps
 
 ## Installation
 
-Install via the package manager
+Install via the package manager.  At the moment you should checkout or
+clone the current master rather than using Pkg.add() as the current
+master is yet to be tagged.  The package has been recently revised and
+now only runs under Julia v0.6.  (1st September 2017)
 
 ```
-> Pkg.add("PerceptualColourMaps")
+julia>  Pkg.clone("https://github.com/peterkovesi/PerceptualColourMaps.jl")
 ```
 
-**Latest change** By default cmap() now returns just the colour
-map, this makes it more convenient to use.  If you set the keyword
-argument `returnname = true` the function returns a tuple (colourmap,
-name, description) as before.
+**New** cmap() now includes some colour maps for the colour blind. One
+set of maps have been designed to lie within the 2D model of
+protanopic/deuteranopic colour space, and a second set for the 2D
+model of tritanopic colour space.  I would value any feedback on the
+usefulness, or otherwise, of these maps.
+
 
 ## Summary
 
@@ -266,6 +271,21 @@ that the colour map does not induce an independent shading pattern
 that can interfere with, or even hide, the structures induced by the
 relief shading. The relief shading provides the structural information
 and the colours provide the data classification information.
+
+![Colour Blind Colour Map](doc/diverging-protanopic-deuteranopic_bwy_60-95_c32_n256.png)
+
+**Colour Blind** colour maps. These are not designed to be merely
+'colour blind safe'. These maps have been constructed to lie within
+either the 2D model of protanopic/deuteranopic colour space, or the 2D
+model of tritanopic colour space.  Hopefully by working within these
+colour spaces people who are colour blind will be able to share a
+common perceptual interpretation of data with those who have normal
+colour vision.  It also ensures maximal use of the available colour
+spaces, and allows chroma and lightness to be properly used in the
+design of colour maps.  I would value any feedback on the usefulness,
+or otherwise, of these maps.
+
+
 
 ## Links
 * [Function reference](doc/index.md)
