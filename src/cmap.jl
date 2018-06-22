@@ -1772,7 +1772,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     # If specified apply a cyclic shift to the colour map
     if shift != 0
-        if !contains(lowercase(attributeStr), "cyclic")
+        if !contains(lowercase(CM.attributeStr), "cyclic")
             warn("Colour map shifting being applied to a non-cyclic map")
         end
         map = circshift(map, round(Int, N*shift))

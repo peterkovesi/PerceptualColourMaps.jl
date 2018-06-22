@@ -7,14 +7,22 @@
 
 println("testing utilites")
 
+using PerceptualColourMaps
+using Base.Test
+
 # bbspline
 P = [0 1 2 3
      0 1 2 3]
 k = 3
 N = 10
 S = bbspline(P, k, N)
-dx = gradient(vec(S[1,:]))
-dy = gradient(vec(S[2,:]))
+#dx = Base.LinAlg.gradient(S[1,:],1)
+#dy = Base.LinAlg.gradient(S[2,:],1)
+# There seems to be an awkward method ambiguity between Base.LinAlg.gradient and
+# Calculus.gradient, hence the simple replacement code below.
+dx = S[1, 2:end] - S[1, 1:(end-1)]
+dy = S[2, 2:end] - S[2, 1:(end-1)]
+
 slope = dy./dx
 @test maximum(slope - 1) < 1e-3
 
