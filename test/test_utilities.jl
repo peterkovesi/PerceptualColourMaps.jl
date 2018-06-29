@@ -86,24 +86,3 @@ sr = sineramp((256, 512), 12.5, 8, 2)
 (img, alpha) = circlesineramp()
 (img, alpha) = circlesineramp(512, pi/10, 8, 2, false)
 
-# meshgrid
-xrange = -3:2
-yrange = 2:.5:6
-(x,y) = meshgrid(xrange, yrange) # two arguments
-(rows,cols) = size(x)
-for r = 1:rows
-    @test all(x[r:r,:] .== xrange')
-end
-for c = 1:cols
-    @test all(y[:,c:c] .== yrange)
-end
-
-arange = 2:.1:4
-(x,y) = meshgrid(arange)  # one argument
-(rows,cols) = size(x)
-for r = 1:rows
-    @test all(x[r:r,:] .== arange')
-end
-for c = 1:cols
-    @test all(y[:,c:c] .== arange)
-end

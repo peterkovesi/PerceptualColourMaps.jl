@@ -1,7 +1,7 @@
 #=----------------------------------------------------------------------------
 
-Copyright (c) 2015 Peter Kovesi
-pk@peterkovesi.com
+Copyright (c) 2015-2018 Peter Kovesi
+peterkovesi.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,8 +84,8 @@ Arguments for Usage 1 and 2:
                 for.  Type 'cmap()' with no arguments to get a full list of
                 possible colour maps and their corresponding labels.
 
-  labels:  "L1" - "L15"  for linear maps
-           "D1" - "D12"  for diverging maps
+  labels:  "L1" - "L19"  for linear maps
+           "D1" - "D13"  for diverging maps
            "C1" - "C9"   for cyclic maps
            "R1" - "R3"   for rainbow maps
            "I1" - "I3"   for isoluminant maps
@@ -297,11 +297,12 @@ arXiv:1509.03700 [cs.GR] 2015.
 October  2015 - Ported to Julia from MATLAB
 December 2015 - Tweaked control points for some colour maps to keep them in gamut
 November 2016 - Compatibility with 0.5, Mods to heat colour map
+June     2018 - Updated and added some colour maps
 
 ----------------------------------------------------------------------------=#
 
 function cmap()
-    cmap("all")    # List al colour maps available
+    cmap("all")    # List all colour maps available
 end
 
 function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
@@ -377,8 +378,6 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0))
 
     push!(cmapdef, "HEAT" => cmapdef["L3"])  # Convenience name
-    push!(cmapdef, "FIRE" => cmapdef["L3"])
-
 
     # "HEATYELLOW"
     push!(cmapdef, "L4" =>
@@ -463,15 +462,15 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           attributeStr = "linear",
                           hueStr = "bmy",
                           colourspace = "LAB",
-                          colpts = [10 ch2ab( 55,-58)
+                          colpts = [10 ch2ab(55,-58)
                                     20 ch2ab(75,-58)
-                                    30 ch2ab( 75,-40)
-                                    40 ch2ab( 73,-20)
-                                    50 ch2ab( 75,  0)
-                                    60 ch2ab( 70, 30)
-                                    70 ch2ab( 65, 60)
-                                    80 ch2ab( 75, 80)
-                                    95 ch2ab( 80, 105)],
+                                    30 ch2ab(75,-40)
+                                    40 ch2ab(73,-20)
+                                    50 ch2ab(75,  0)
+                                    60 ch2ab(70, 30)
+                                    70 ch2ab(65, 60)
+                                    80 ch2ab(75, 80)
+                                    95 ch2ab(80, 105)],
                           splineorder = 2,
                           formula = "CIE76",
                           W = [1, 0, 0],
@@ -485,13 +484,13 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           attributeStr = "linear",
                           hueStr = "bgyw",
                           colourspace = "LAB",
-                          colpts = [15  49 -64
-                                    35  67 -100
-                                    45 -12 -29
-                                    60 -55 60
-                                    85 -10 80
-                                    95 -17 50
-                                    100 0  0],
+                          colpts = [20  59 -80
+                                    35  28 -66
+                                    45 -14 -29
+                                    60 -62  60
+                                    85 -10  85
+                                    95 -15  70
+                                    98   0   0],
                           splineorder = 2,
                           formula = "CIE76",
                           W = [1, 0, 0],
@@ -564,7 +563,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     # salience no matter what channel-colour assignment is made.  The colour
     # maps are specified as straight lines in RGB space.  For their derivation
     # see
-    # http://peterkovesi.com/projects/colourmaps/ColourmapTheory/index.html#ternary
+    # https://arxiv.org/abs/1509.03700
 
     # "REDTERNARY"
     push!(cmapdef, "L13" =>
@@ -611,15 +610,120 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     push!(cmapdef, "BLUETERNARY" => cmapdef["L15"])
 
-     #--------------------------------------------------------------------------------
-     ## Diverging colour maps
+    # Variation of L9  Black - Blue - green - yellow - white.  Works well.
+    push!(cmapdef, "L16" =>
+          newcolourmapdef(desc = "Black-Blue-Green-Yellow-White colour map",
+                          attributeStr = "linear",
+                          hueStr = "kbgyw",
+                          colourspace = "LAB",
+                          colpts = [  5   0   0
+                                     20  59 -80
+                                     35  28 -66
+                                     45 -14 -29
+                                     60 -62  60
+                                     85 -10  85
+                                     95 -15  70
+                                     98   0   0],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
 
-     # Note that on these colour maps often we do not go to full white but use a
-     # lightness value of 95. This helps avoid saturation problems on monitors.
-     # A lightness smoothing sigma of 5 to 7 is used to avoid generating a false
-     # feature at the white point in the middle.  Note however, this does create
-     # a small perceptual contrast blind spot at the middle.
+    # Map with linear decreasing lightness, increasing chroma to blue.
+    # Precompute a spiral of increasing chroma down through Lab space
+    nsteps = 12
+    ang1 = 120; ang2 = -60   # Linearly interpolate hue angle
+    ang = linspace(ang1, ang2, nsteps)
 
+    # Interpolate chroma but use a 'gamma' of 0.5 to keep the colours more saturated.
+    sat1 = 0; sat2 = 80
+    sat =  (linspace(sat1, sat2, nsteps)/sat2).^0.5 * sat2
+
+    l1 = 100; l2 = 25        # Linearly interpolate lightness
+    l = linspace(l1, l2, nsteps)
+
+    colptarray = zeros(nsteps,3)
+    for n=1:nsteps
+        colptarray[n,:] = [l[n]  ch2ab(sat[n], ang[n])]
+    end
+
+    push!(cmapdef, "L17" =>
+          newcolourmapdef(desc = "White-Orange-Red-Blue, decreasing lightness with increasing saturation",
+                          attributeStr = "linear",
+                          hueStr = "worb",
+                          colourspace = "LAB",
+                          colpts = colptarray,
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
+
+    # White-Yellow-Orange-Red, decreasing lightness with increasing saturation
+    # Precompute a spiral of increasing chroma down through Lab space
+    nsteps = 12
+    ang1 = 120; ang2 = 35
+    ang = linspace(ang1, ang2, nsteps)
+    
+    sat1 = 0; sat2 = 84
+    sat =  (linspace(sat1, sat2, nsteps)/sat2).^0.5 * sat2
+    
+    l1 = 100; l2 = 45       
+    l = linspace(l1, l2, nsteps)
+    
+    colptarray = zeros(nsteps,3)
+    for n=1:nsteps
+        colptarray[n,:] = [l[n]  ch2ab(sat[n], ang[n])]
+    end
+    
+    push!(cmapdef, "L18" =>
+          newcolourmapdef(desc = "White-Yellow-Orange-Red, decreasing lightness with increasing saturation",
+                          attributeStr = "linear",
+                          hueStr = "wyor",
+                          colourspace = "LAB",
+                          colpts = colptarray,
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
+    
+    # White-Cyan-Magenta-Red, decreasing lightness with increasing saturation
+    # Precompute a spiral of increasing chroma down through Lab space
+    nsteps = 12
+    ang1 = -140; ang2 = 40
+    ang = linspace(ang1, ang2, nsteps)
+    
+    sat1 = 0; sat2 = 84
+    sat =  (linspace(sat1, sat2, nsteps)/sat2).^0.5 * sat2
+    
+    l1 = 100; l2 = 45       
+    l = linspace(l1, l2, nsteps)
+    
+    colptarray = zeros(nsteps,3)
+    for n=1:nsteps
+        colptarray[n,:] = [l[n]  ch2ab(sat[n], ang[n])]
+    end
+    
+    push!(cmapdef, "L19" =>
+          newcolourmapdef(desc = "White-Cyan-Magenta-Red, decreasing lightness with increasing saturation",
+                          attributeStr = "linear",
+                          hueStr = "wcmr",
+                          colourspace = "LAB",
+                          colpts = colptarray,
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
+    
+    
+    #--------------------------------------------------------------------------------
+    ## Diverging colour maps
+    
+    # Note that on these colour maps often we do not go to full white but use a
+    # lightness value of 95. This helps avoid saturation problems on monitors.
+    # A lightness smoothing sigma of 5 to 7 is used to avoid generating a false
+    # feature at the white point in the middle.  Note however, this does create
+    # a small perceptual contrast blind spot at the middle.
+    
     push!(cmapdef, "D1" =>
           newcolourmapdef(desc = "Diverging blue-white-red colour map",
                           attributeStr = "diverging",
@@ -635,19 +739,20 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     push!(cmapdef, "COOLWARM" => cmapdef["D1"])
 
-    # Attempt to imrove metric property of D1
+    # Variation on D1 with darker end point colours
     push!(cmapdef, "D1A" =>
           newcolourmapdef(desc = "Diverging blue-white-red colour map",
                           attributeStr = "diverging",
                           hueStr = "bwr",
                           colourspace = "LAB",
-                          colpts = [40  ch2ab(83,-64)
-                                    65  ch2ab(70, -28)
+                          colpts = [20  ch2ab(49, -64)
+                                    40  ch2ab(83, -64)
+                                    65  ch2ab(60, -64)
                                     95  0   0
-                                    95  0   0
-                                    65  ch2ab(70, 75)
-                                    40  ch2ab(83, 39)],
-                          splineorder = 3,
+                                    65  ch2ab(60, 37)
+                                    40  ch2ab(83, 37)
+                                    20  ch2ab(49, 37)],
+                          splineorder = 2,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 7))
@@ -727,7 +832,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           colourspace = "LAB",
                           colpts = [30 ch2ab(89, -59)
                                     60 0 0
-                                    90 ch2ab(89,96)],
+                                    90 ch2ab(89, 96)],
                           splineorder = 2,
                           formula = "CIE76",
                           W = [1, 0, 0],
@@ -763,9 +868,9 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           attributeStr = "diverging-linear",
                           hueStr = "bjr",
                           colourspace = "LAB",
-                          colpts = [30 ch2ab(105, -57)
+                          colpts = [30 ch2ab(105, -58)
                                     42.5 0 0
-                                    55 ch2ab(105,41)],
+                                    55 ch2ab(105, 41)],
                           splineorder = 2,
                           formula = "CIE76",
                           W = [1, 0, 0],
@@ -833,8 +938,28 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 7))
 
 
-     #-------------------------------------------------------------------------
-     ## Cyclic colour maps
+    # Pleasing Blue-White-Green diverging map
+    push!(cmapdef, "D13" =>
+          newcolourmapdef(desc = "Diverging blue - white - green colour map",
+                          attributeStr = "diverging",
+                          hueStr = "bwg",
+                          colourspace = "LAB",
+                          colpts = [20  ch2ab(40, -70)
+                                    45  ch2ab(60, -70)
+                                    70  ch2ab(50, -70-35)
+                                    95  0 0
+                                    95  0 0
+                                    70  ch2ab(50, 138+35)
+                                    45  ch2ab(60, 138)
+                                    20  ch2ab(40, 138)],
+                          splineorder = 3,
+                          formula = "CIE76",
+                          W = [1, 1, 1],
+                          sigma = 5))
+
+
+    #-------------------------------------------------------------------------
+    ## Cyclic colour maps
 
     # I think this is my best zigzag style cyclic map - Good!  Control
     # points are placed so that lightness steps up and down are
@@ -1016,8 +1141,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 7))
 
 
-     #-----------------------------------------------------------------------------
-     ##  Rainbow style colour maps
+    #-----------------------------------------------------------------------------
+    ##  Rainbow style colour maps
 
     #  "RAINBOW" a reasonable rainbow colour map after it has been
     # fixed by equalisecolourmap.
@@ -1082,8 +1207,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     push!(cmapdef, "RAINBOW3" => cmapdef["R3"])
 
-     #-----------------------------------------------------------------------------
-     ##  Isoluminant colour maps
+    #-----------------------------------------------------------------------------
+    ##  Isoluminant colour maps
 
     push!(cmapdef, "I1" =>
           newcolourmapdef(desc = "Isoluminant blue to green to orange at lightness 70.  " *
@@ -1635,76 +1760,6 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 0))
 
-   # Francesca Samsel's beautiful c15b blue-white-green diverging map.
-   # Map is reproduced in its original form with no equalisation of
-   # lightness gradient.  (It is close to being equal as originally
-   # designed.)
-    push!(cmapdef, "XC15B" =>
-          newcolourmapdef(desc = "Francesca Samsel's c15b blue-white-green diverging map",
-                          attributeStr = "diverging",
-                          hueStr = "bwg",
-                          colourspace = "RGB",
-                          colpts = [0.231373 0.247059 0.329412
-                                    0.266667 0.305882 0.411765
-                                    0.286275 0.368627 0.478431
-                                    0.301961 0.439216 0.549020
-                                    0.309804 0.521569 0.619608
-                                    0.380392 0.631373 0.690196
-                                    0.454902 0.745098 0.760784
-                                    0.541176 0.831373 0.803922
-                                    0.631373 0.901961 0.843137
-                                    0.768627 0.960784 0.894118
-                                    0.901961 1.000000 0.949020
-                                    0.768627 0.960784 0.835294
-                                    0.635294 0.909804 0.698039
-                                    0.552941 0.850980 0.576471
-                                    0.490196 0.780392 0.466667
-                                    0.447059 0.701961 0.384314
-                                    0.407843 0.611765 0.305882
-                                    0.360784 0.509804 0.231373
-                                    0.305882 0.400000 0.160784
-                                    0.231373 0.278431 0.098039
-                                    0.141176 0.149020 0.043137],
-                          splineorder = 2,
-                          formula = "CIE76",
-                          W = [0, 0, 0],     # Set to zero to reproduce original map exactly
-                          sigma = 0))
-
-   # Francesca's map modified slightly with additional starting
-   # control point to create symmetric lightness
-   # profile. Alternatively, remove the near black colour at the end.
-   # Map is equalised for lightness gradient.  A really nice map!
-    push!(cmapdef, "XC15BM" =>
-          newcolourmapdef(desc = "Francesca Samsel's c15b blue-white-green diverging map",
-                          attributeStr = "diverging",
-                          hueStr = "bwg",
-                          colourspace = "RGB",
-                          colpts = [0.231373 0.247059 0.329412
-                                    0.266667 0.305882 0.411765
-                                    0.286275 0.368627 0.478431
-                                    0.301961 0.439216 0.549020
-                                    0.309804 0.521569 0.619608
-                                    0.380392 0.631373 0.690196
-                                    0.454902 0.745098 0.760784
-                                    0.541176 0.831373 0.803922
-                                    0.631373 0.901961 0.843137
-                                    0.768627 0.960784 0.894118
-                                    0.901961 1.000000 0.949020
-                                    0.768627 0.960784 0.835294
-                                    0.635294 0.909804 0.698039
-                                    0.552941 0.850980 0.576471
-                                    0.490196 0.780392 0.466667
-                                    0.447059 0.701961 0.384314
-                                    0.407843 0.611765 0.305882
-                                    0.360784 0.509804 0.231373
-                                    0.305882 0.400000 0.160784
-                                    0.2218    0.2690    0.0890
-                                    ],
-                          splineorder = 2,
-                          formula = "CIE76",
-                          W = [1, 0, 0],
-                          sigma = 7))
-
 
     # Linear diverging green - grey - yellow Reasonable, perhaps
     # easier on the eye than D7
@@ -1725,14 +1780,14 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     # -------- End of dictionary construction ---------------------
 
-     CM = newcolourmapdef()  # Create a colour map definition in main scope
+    CM = newcolourmapdef()  # Create a colour map definition in main scope
 
-     try
-         CM = cmapdef[uppercase(I)]
-     catch
-         catalogue(cmapdef, I)
-         return
-     end
+    try
+        CM = cmapdef[uppercase(I)]
+    catch
+        catalogue(cmapdef, I)
+        return
+    end
 
     ##-------------------------------------------------------------
 
@@ -1839,7 +1894,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 end
 
 #------------------------------------------------------------------
-# Conversion from (chroma, hue angle degrees) description to (a*, b*) coords
+# Conversion from (chroma, hue angle degrees) description to (a*, b*) coords.
+# Note we return a 1 x 2 matrix
 
 function ch2ab(chroma, angle_degrees)
     theta = angle_degrees/180*pi
@@ -2165,7 +2221,7 @@ function equalisecolourmap(rgblab::AbstractString, cmap::Array{Float64,2},
              1:N, a-labmap[:,2],
              1:N, b-labmap[:,3])
         PyPlot.legend(["Lightness", "a", "b"], "upper left")
-        maxe = maximum(abs([L-labmap[:,1]; a-labmap[:,2]; b-labmap[:,3]]))
+        maxe = maximum(abs.([L-labmap[:,1]; a-labmap[:,2]; b-labmap[:,3]]))
         PyPlot.axis([1, N, -maxe, maxe])
         PyPlot.title("Difference between desired and achieved L a b values (gamut clipping)")
 

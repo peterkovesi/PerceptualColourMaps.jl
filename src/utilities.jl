@@ -20,7 +20,7 @@ The Software is provided "as is", without warranty of any kind.
 
 export bbspline, pbspline, gaussfilt1d, interp1, matprint
 export normalise, normalize
-export histtruncate, meshgrid
+export histtruncate
 export sineramp, circlesineramp
 
 #-----------------------------------------------------------------------
@@ -734,9 +734,8 @@ function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
     cycles = round(circum/wavelen)
 
     # Angles are +ve anticlockwise and mod 2*pi
-    (x,y) = meshgrid((0:sze-1)-sze/2)
-    theta = mod.(atan2.(-y,x), 2*pi)
-    rad = sqrt.(x.^2 + y.^2)
+    theta = [mod(atan2(-y,x), 2*pi) for y = -sze/2:sze/2, x = -sze/2:sze/2 ] 
+    rad = [sqrt(x^2 + y^2) for y = -sze/2:sze/2, x = -sze/2:sze/2 ] 
 
     # Normalise radius so that it varies 0-1 over minr to maxr
     rad = (rad-minr)/(maxr-minr)
@@ -761,58 +760,4 @@ function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
    return img, alpha
 end
 
-#----------------------------------------------------------------------
-"""
-meshgrid - Generates cartesian grid in 2D space
-```
-Usage: (x, y) = meshgrid(xrange, yrange)
-
-       (x, y) = meshgrid(xyrange)
-
-Arguments:
-      xrange, yrange - Ranges or vectors defining the values to
-                       be placed in the cartesian grid.
-
-             xyrange - Range of vector that is to be used for both x and y.
-
-Returns:  x, y - Arrays of size length(yrange) x length(xrange)
-                 defining the cartesian grid
-```
-
-Simple replacement for MATLAB's meshgrid function.
-
-"""
-
-# Various versions for different argument types
-
-function meshgrid(xrange::Range, yrange::Range)
-    return meshgrid(collect(xrange), collect(yrange))
-end
-
-function meshgrid(xrange::Range, yrange::Vector)
-    return meshgrid(collect(xrange), collect(yrange))
-end
-
-function meshgrid(xrange::Vector, yrange::Range)
-    return meshgrid(collect(xrange), collect(yrange))
-end
-
-function meshgrid(xyrange::Vector)
-    return meshgrid(collect(xyrange), collect(xyrange))
-end
-
-function meshgrid(xyrange::Range)
-    return meshgrid(collect(xyrange), collect(xyrange))
-end
-
-# Vector version
-function meshgrid(xrange::Vector, yrange::Vector)
-
-    rows = length(yrange)
-    cols = length(xrange)
-
-    x = repmat(collect(xrange)', rows, 1)
-    y = repmat(collect(yrange) , 1, cols)
-
-    return x,y
-end
+#---------------------------------------------------------------------

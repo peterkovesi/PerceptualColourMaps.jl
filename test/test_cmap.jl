@@ -11,7 +11,12 @@ println("testing cmap")
 # list of all the colour maps and in the process generates them all.
 cmap()
 
-#=  See if this is what causes Travis to fail...
+# Test that all options such as shifting do not crash
+testmap = cmap("C1", shift=0.25)
+testmap = cmap("C2", N=24, shift=0.25)
+testmap = cmap("C2", reverse=true)
+testmap = cmap("C3", shift=0.25, chromaK = 0.5)
+
 # equalisecolourmap: Generate a colour map in Lab space with an uneven
 # ramp in lightness and check that this is corrected
 rgblab = "LAB"
@@ -25,9 +30,9 @@ rgbmap = equalisecolourmap(rgblab, labmap, formula, W, sigma)
 # Convert to Nx3 array and then back to lab space. Then check that dL
 # is roughly constant
 labmap2 = srgb2lab(rgbmap)
-dL = gradient(labmap2[:,1])
+#dL = gradient(labmap2[:,1])  # gradient dramas
+dL = labmap2[2:end,1] - labmap2[1:end-1,1]
 @test maximum(dL[2:end-1]) - minimum(dL[2:end-1]) < 1e-1
-=#
 
 # linearrgbmap
 rgbmap = linearrgbmap([1,1,1],99)
