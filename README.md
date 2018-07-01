@@ -11,7 +11,7 @@ PerceptualColourMaps
 
 ## Installation
 
-Install via the package manager. Currently the package only runs under v0.6
+Install via the package manager.  Currently the package only runs under v0.6
 
 ```
 julia>  Pkg.add("PerceptualColourMaps")
