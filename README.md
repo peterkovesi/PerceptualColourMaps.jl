@@ -11,20 +11,17 @@ PerceptualColourMaps
 
 ## Installation
 
-Install via the package manager.  At the moment you should checkout or
-clone the current master rather than using Pkg.add() as the current
-master is yet to be tagged.  The package has been recently revised and
-now only runs under Julia v0.6.  (1st September 2017)
+Install via the package manager. Currently the package only runs under v0.6
+
+```
+julia>  Pkg.add("PerceptualColourMaps")
+```
+
+If you are after the latest master use:
 
 ```
 julia>  Pkg.clone("https://github.com/peterkovesi/PerceptualColourMaps.jl")
 ```
-
-**New** cmap() now includes some colour maps for the colour blind. One
-set of maps have been designed to lie within the 2D model of
-protanopic/deuteranopic colour space, and a second set for the 2D
-model of tritanopic colour space.  I would value any feedback on the
-usefulness, or otherwise, of these maps.
 
 
 ## Summary
