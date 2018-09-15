@@ -21,8 +21,8 @@ testmap = cmap("C3", shift=0.25, chromaK = 0.5)
 # ramp in lightness and check that this is corrected
 rgblab = "LAB"
 labmap = zeros(256,3)
-labmap[1:127,1] = linspace(0,20,127)
-labmap[128:256,1] = linspace(20,100,129)
+labmap[1:127,1] = range(0, stop=20, length=127)
+labmap[128:256,1] = range(20, stop=100, length=129)
 formula = "CIE76"
 W = [1,0,0]
 sigma = 1

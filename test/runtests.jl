@@ -1,5 +1,5 @@
 using PerceptualColourMaps
-using Base.Test
+using Test, LinearAlgebra, Statistics
 
 include("test_cmap.jl")
 include("test_applycolourmaps.jl")

@@ -40,10 +40,8 @@ Returns:     S - spline curve  [dim x N] spline points
 ```
 See also: pbspline
 """
-
-# PK Jan 2014
-
-function bbspline(P::Array, k::Int, N::Int = 100)
+function bbspline(P::AbstractMatrix, k::Int, N::Int = 100)
+    # PK Jan 2014
 
     (dim, np1) = size(P)
     n = np1-1
@@ -56,7 +54,7 @@ function bbspline(P::Array, k::Int, N::Int = 100)
     # There are k repeated knots at each end.
     ti = collect(0:(k+n - 2*(k-1)))'
     ti = ti/ti[end]
-    ti = [repmat([ti[1]], 1, k-1)  ti  repmat([ti[end]], 1, k-1)]
+    ti = [repeat([ti[1]], 1, k-1)  ti  repeat([ti[end]], 1, k-1)]
 
     nK = length(ti)
 
@@ -68,8 +66,8 @@ function bbspline(P::Array, k::Int, N::Int = 100)
     # arrays, one storing the basis functions at the current level of
     # recursion, and one storing the basis functions from the previous
     # level of recursion
-    Blast = Array{Array{Float64}}(nK-1)
-    B = Array{Array{Float64}}(nK-1)
+    Blast = Array{Array{Float64}}(undef, nK-1)
+    B = Array{Array{Float64}}(undef, nK-1)
 
     # 1st level of recursive construction
     for i = 1:nK-1
@@ -87,13 +85,13 @@ function bbspline(P::Array, k::Int, N::Int = 100)
             if (ti[i+ki-1] - ti[i]) < eps()
                 V1 = zeros(1,N)
             else
-                V1 = (t - ti[i])/(ti[i+ki-1] - ti[i]) .* Blast[i]
+                V1 = (t .- ti[i])/(ti[i+ki-1] - ti[i]) .* Blast[i]
             end
 
             if (ti[i+ki] - ti[i+1]) < eps()
                 V2 = zeros(1,N)
             else
-                V2 = (ti[i+ki] - t)/(ti[i+ki] - ti[i+1]) .* Blast[i+1]
+                V2 = (ti[i+ki] .- t)/(ti[i+ki] - ti[i+1]) .* Blast[i+1]
             end
 
             B[i] = V1 + V2
@@ -145,12 +143,11 @@ the formation of cyclic paths in colour space.
 
 See also: bbspline
 """
-# PK March 2014
-# Needs a bit of tidying up and checking on domain of curve
-# Should be merged with bbspline
-# Issue: If N is too small one can get out of bounds errors at line 193
-
-function pbspline(Pin::Array, k::Int, N::Int = 100)
+function pbspline(Pin::AbstractArray, k::Int, N::Int = 100)
+    # PK March 2014
+    # Needs a bit of tidying up and checking on domain of curve
+    # Should be merged with bbspline
+    # Issue: If N is too small one can get out of bounds errors at line 193
 
     P = copy(Pin)  # Make a copy because we will be altering P
 
@@ -185,8 +182,8 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
     # arrays, one storing the basis functions at the current level of
     # recursion, and one storing the basis functions from the previous
     # level of recursion
-    Blast = Array{Array{Float64}}(nK-1)
-    B = Array{Array{Float64}}(nK-1)
+    Blast = Array{Array{Float64}}(undef, nK-1)
+    B = Array{Array{Float64}}(undef, nK-1)
 
     # 1st level of recursive construction
     for i = 1:nK-1
@@ -205,13 +202,13 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
             if (ti[i+ki-1] - ti[i]) < eps()
                 V1 = zeros(1,N)
             else
-                V1 = (t - ti[i])/(ti[i+ki-1] - ti[i]) .* Blast[i]
+                V1 = (t .- ti[i])/(ti[i+ki-1] - ti[i]) .* Blast[i]
             end
 
             if (ti[i+ki] - ti[i+1]) < eps()
                 V2 = zeros(1,N)
             else
-                V2 = (ti[i+ki] - t)/(ti[i+ki] - ti[i+1]) .* Blast[i+1]
+                V2 = (ti[i+ki] .- t)/(ti[i+ki] - ti[i+1]) .* Blast[i+1]
             end
 
             B[i] = V1 + V2
@@ -245,10 +242,10 @@ function pbspline(Pin::Array, k::Int, N::Int = 100)
 
     distsqrd = zeros(size(S[1,:]))
     for d = 1:dim
-        distsqrd += (S[d,:] - P[d,1]).^2
+        distsqrd += (S[d,:] .- P[d,1]).^2
     end
 
-    ind = indmin(distsqrd)
+    ind = argmin(distsqrd)
 
     return S = circshift(S, [0, -ind+1])
 end
@@ -322,8 +319,6 @@ If any xi are outside the range of x then the corresponding value of
 yi is set to the appropriate end value of y.
 
 """
-
-#function interp1{T<:Real}(x::AbstractArray{T,1}, y::AbstractArray{T,1}, xi::Array{T,1})
 function interp1(x, y, xi)
 
     N = length(xi)
@@ -342,8 +337,8 @@ function interp1(x, y, xi)
             yi[i] = y[end]
 
         else
-            left = maximum(find(x .<= xi[i]))
-            right = minimum(find(x .> xi[i]))
+            left = maximum(findall(x .<= xi[i]))
+            right = minimum(findall(x .> xi[i]))
 
             yi[i] = y[left] +  (xi[i]-x[left])/(x[right]-x[left]) * (y[right] - y[left])
         end
@@ -412,18 +407,17 @@ Arguments:  img     - A grey-level input image.
 Offsets and rescales image so that nimg has mean reqmean and variance
 reqvar.
 """
-
-# Normalise 0 - 1
 function normalise(img::Array)
-    n = img - minimum(img)
+    # Normalise 0 - 1
+    n = img .- minimum(img)
     return n = n/maximum(n)
 end
 
 # Normalise to desired mean and variance
 function normalise(img::Array, reqmean::Real, reqvar::Real)
-    n = img - mean(img)
+    n = img .- mean(img)
     n = n/std(img)      # Zero mean, unit std dev
-    return n = reqmean + n*sqrt(reqvar)
+    return n = reqmean .+ n*sqrt(reqvar)
 end
 
 # For those who spell normalise with a 'z'
@@ -444,7 +438,6 @@ Arguments:  img     - A grey-level input image.
 Offsets and rescales image so that nimg has mean reqmean and variance
 reqvar.
 """
-
 function normalize(img::Array)
     return normalise(img)
 end
@@ -491,13 +484,11 @@ Returns:
 ```
 See also: normalise
 """
-
-# July      2001 - Original version
-# February  2012 - Added handling of NaN values in image
-# February  2014 - Code cleanup
-# September 2014 - Default for uHistCut + cleanup
-
 function  histtruncate(img::Array, lHistCut::Real, uHistCut::Real)
+    # July      2001 - Original version
+    # February  2012 - Added handling of NaN values in image
+    # February  2014 - Code cleanup
+    # September 2014 - Default for uHistCut + cleanup
 
     if lHistCut < 0 || lHistCut > 100 || uHistCut < 0 || uHistCut > 100
 	error("Histogram truncation values must be between 0 and 100")
@@ -523,8 +514,8 @@ function  histtruncate(img::Array, lHistCut::Real, uHistCut::Real)
     high_val = sortv[hind]
 
     # Adjust image
-    newimg[newimg .< low_val] = low_val
-    newimg[newimg .> high_val] = high_val
+    newimg[newimg .< low_val] .= low_val
+    newimg[newimg .> high_val] .= high_val
 
     return newimg
 end
@@ -594,34 +585,34 @@ and amplitude.
 
 See also: circlesineramp, chirplin, chirpexp, equalisecolourmap, cmap
 """
-#=
-The Default Wavelength:
-The default wavelength is 8 pixels.  On a computer monitor with a nominal
-pixel pitch of 0.25mm this corresponds to a wavelength of 2mm.  With a monitor
-viewing distance of 600mm this corresponds to 0.19 degrees of viewing angle or
-approximately 5.2 cycles per degree.  This falls within the range of spatial
-frequencies (3-7 cycles per degree ) at which most people have maximal
-contrast sensitivity to a sine wave grating (this varies with mean luminance).
-A wavelength of 8 pixels is also sufficient to provide a reasonable discrete
-representation of a sine wave.  The aim is to present a stimulus that is well
-matched to the performance of the human visual system so that what we are
-primarily evaluating is the colour map's perceptual contrast and not the visual
-performance of the viewer.
-
-The Default Amplitude:
-This is set at 12.5 so that from peak to trough we have a local feature of
-magnitude 25.  This is approximately 10% of the 256 levels in a standard
-colour map. It is not uncommon for colour maps to have perceptual flat spots
-that can hide features of this magnitude.
-=#
-
-# July  2013  Original version.
-# March 2014  Adjustments to make it better for evaluating cyclic colour maps.
-# June  2014  Default wavelength changed from 10 to 8.
-
-# ** Should I make this function return UInt8 values ?**
-
 function sineramp(sze=(256,512), amp=12.5, wavelen=8, p=2)
+    #=
+    The Default Wavelength:
+    The default wavelength is 8 pixels.  On a computer monitor with a nominal
+    pixel pitch of 0.25mm this corresponds to a wavelength of 2mm.  With a monitor
+    viewing distance of 600mm this corresponds to 0.19 degrees of viewing angle or
+    approximately 5.2 cycles per degree.  This falls within the range of spatial
+    frequencies (3-7 cycles per degree ) at which most people have maximal
+    contrast sensitivity to a sine wave grating (this varies with mean luminance).
+    A wavelength of 8 pixels is also sufficient to provide a reasonable discrete
+    representation of a sine wave.  The aim is to present a stimulus that is well
+    matched to the performance of the human visual system so that what we are
+    primarily evaluating is the colour map's perceptual contrast and not the visual
+    performance of the viewer.
+
+    The Default Amplitude:
+    This is set at 12.5 so that from peak to trough we have a local feature of
+    magnitude 25.  This is approximately 10% of the 256 levels in a standard
+    colour map. It is not uncommon for colour maps to have perceptual flat spots
+    that can hide features of this magnitude.
+    =#
+
+    # July  2013  Original version.
+    # March 2014  Adjustments to make it better for evaluating cyclic colour maps.
+    # June  2014  Default wavelength changed from 10 to 8.
+
+    # ** Should I make this function return UInt8 values ?**
+
 
     # Adjust width of image so that we have an integer number of cycles of
     # the sinewave.  This is helps should one be using the test image to
@@ -714,11 +705,10 @@ whether the data is cyclic over pi, or 2*pi.  SHOWANGULARIM supports this.
 
 See also: applycycliccolourmap, sineramp, chirplin, chirpexp, equalisecolourmap, cmap
 """
-# September 2014  Original version.
-# October   2014  Number of cycles calculated from wave length rather than
-#                 being specified directly.
-
 function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
+    # September 2014  Original version.
+    # October   2014  Number of cycles calculated from wave length rather than
+    #                 being specified directly.
 
     # Set values for inner and outer radii of test pattern
     maxr = sze/2 * 0.9
@@ -734,11 +724,11 @@ function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
     cycles = round(circum/wavelen)
 
     # Angles are +ve anticlockwise and mod 2*pi
-    theta = [mod(atan2(-y,x), 2*pi) for y = -sze/2:sze/2, x = -sze/2:sze/2 ] 
-    rad = [sqrt(x^2 + y^2) for y = -sze/2:sze/2, x = -sze/2:sze/2 ] 
+    theta = [mod(atan(-y,x), 2*pi) for y = -sze/2:sze/2, x = -sze/2:sze/2 ]
+    rad = [sqrt(x^2 + y^2) for y = -sze/2:sze/2, x = -sze/2:sze/2 ]
 
     # Normalise radius so that it varies 0-1 over minr to maxr
-    rad = (rad-minr)/(maxr-minr)
+    rad = (rad.-minr)/(maxr-minr)
 
     # Form the image
     img = amp*rad.^float(p) .* sin.(cycles*theta) + theta
@@ -749,12 +739,12 @@ function circlesineramp(sze=512, amp=pi/10, wavelen=8, p=2, hole=true)
 
     # 'Nanify' values outside normalised radius values of 0-1
     alpha = ones(size(img))
-    img[rad .> 1] = NaN
-    alpha[rad .> 1] = 0
+    img[rad .> 1] .= NaN
+    alpha[rad .> 1] .= 0
 
     if hole
-        img[rad .< 0] = NaN
-        alpha[rad .< 0] = 0
+        img[rad .< 0] .= NaN
+        alpha[rad .< 0] .= 0
     end
 
    return img, alpha

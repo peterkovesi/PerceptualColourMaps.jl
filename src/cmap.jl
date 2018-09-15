@@ -30,7 +30,7 @@ using Interpolations
 
 # Type for defining colour maps for storage in a dictionary
 
-type colourmapdef
+mutable struct colourmapdef
     name::String
     hueStr::String
     attributeStr::String
@@ -44,7 +44,7 @@ type colourmapdef
 end
 
 # Convenience constructor
-function newcolourmapdef{T1<:Real, T2<:Real, T3<:Real}(;
+function newcolourmapdef(;
      name::String="",
      hueStr::String="",
      attributeStr::String="",
@@ -54,7 +54,7 @@ function newcolourmapdef{T1<:Real, T2<:Real, T3<:Real}(;
      splineorder::Int=2,
      formula="CIE76",
      W::Array{T2,1}=[1.0,0.0,0.0],
-     sigma::T3=0.0)
+     sigma::T3=0.0) where {T1<:Real, T2<:Real, T3<:Real}
 
     return colourmapdef(name, hueStr, attributeStr, desc,
                         colourspace, float(colpts), splineorder,
@@ -197,9 +197,9 @@ to take care which image display functions you choose to use.
 
 ```
                     linear_kryw_5-100_c67_n256
-                      /      /    |    \    \
-  Colour Map attribute(s)   /     |     \   Number of colour map entries
-                           /      |      \
+                      /      /    |    \\    \\
+  Colour Map attribute(s)   /     |     \\   Number of colour map entries
+                           /      |      \\
      String indicating nominal    |      Mean chroma of colour map
      hue sequence.                |
                               Range of lightness values
@@ -209,7 +209,7 @@ appended to it, it may also have a flag indicating it is reversed.
 
 ```
               cyclic_wrwbw_90-40_c42_n256_s25_r
-                                          /    \
+                                          /    \\
                                          /   Indicates that the map is reversed.
                                         /
                   Percentage of colour map length
@@ -256,52 +256,51 @@ See also: equalisecolourmap, viewlabspace, sineramp, circlesineramp,
 applycolourmap, applycycliccolourmap, applydivergingcolourmap
 
 """
-#=----------------------------------------------------------------------------
-
-Adding your own colour maps is done by adding a new dictionary entry
-to the code blow.   Note that you must use uppercase keys in the dictionary
-
-1) Colour maps are almost invariably defined via a spline path through CIELAB
-   colourspace.  Use viewlabspace() to work out the positions of the spline
-   control points in CIELAB space to achieve the colour map path you desire.
-   These are stored in an array 'colpts' with columns corresponding to L a and
-   b.  If desired the path can be specified in terms of RGB space by setting
-   'colourspace' to 'RGB'.  See the ternary colour maps as an example.  Note
-   the case expression for the colour map key/label must be upper case.
-
-2) Set 'splineorder' to 2 for a linear spline segments. Use 3 for a quadratic
-   b-spline.
-
-3) If the colour map path has lightness gradient reversals set 'sigma' to a
-   value of around 5 to 7 to smooth the gradient reversal.
-
-4) If the colour map is of very low lightness contrast, or isoluminant, set
-   the lightness, a and b colour difference weight vector W to [1 1 1].
-   See equalisecolourmap() for more details
-
-5) Set the attribute and hue sequence strings ('attributeStr' and 'hueStr')
-   appropriately so that a colour map name can be generated.  Note that if you
-   are constructing a cyclic colour map it is important that 'attributeStr'
-   contains the word 'cyclic'.  This ensures that a periodic b-spline is used
-   and also ensures that smoothing is applied in a cyclic manner.  Setting the
-   description string is optional.
-
-6) Run cmap() specifying the key/label you have given your new colour map
-   with the diagnostics flag set to one.  Various plots are generated
-   allowing you to check the perceptual uniformity, colour map path,
-   and any gamut clipping of your colour map.
-
-Reference: Peter Kovesi. Good Colour Maps: How to Design Them.
-arXiv:1509.03700 [cs.GR] 2015.
-
-October  2015 - Ported to Julia from MATLAB
-December 2015 - Tweaked control points for some colour maps to keep them in gamut
-November 2016 - Compatibility with 0.5, Mods to heat colour map
-June     2018 - Updated and added some colour maps
-
-----------------------------------------------------------------------------=#
-
 function cmap()
+    #=----------------------------------------------------------------------------
+
+    Adding your own colour maps is done by adding a new dictionary entry
+    to the code blow.   Note that you must use uppercase keys in the dictionary
+
+    1) Colour maps are almost invariably defined via a spline path through CIELAB
+       colourspace.  Use viewlabspace() to work out the positions of the spline
+       control points in CIELAB space to achieve the colour map path you desire.
+       These are stored in an array 'colpts' with columns corresponding to L a and
+       b.  If desired the path can be specified in terms of RGB space by setting
+       'colourspace' to 'RGB'.  See the ternary colour maps as an example.  Note
+       the case expression for the colour map key/label must be upper case.
+
+    2) Set 'splineorder' to 2 for a linear spline segments. Use 3 for a quadratic
+       b-spline.
+
+    3) If the colour map path has lightness gradient reversals set 'sigma' to a
+       value of around 5 to 7 to smooth the gradient reversal.
+
+    4) If the colour map is of very low lightness contrast, or isoluminant, set
+       the lightness, a and b colour difference weight vector W to [1 1 1].
+       See equalisecolourmap() for more details
+
+    5) Set the attribute and hue sequence strings ('attributeStr' and 'hueStr')
+       appropriately so that a colour map name can be generated.  Note that if you
+       are constructing a cyclic colour map it is important that 'attributeStr'
+       contains the word 'cyclic'.  This ensures that a periodic b-spline is used
+       and also ensures that smoothing is applied in a cyclic manner.  Setting the
+       description string is optional.
+
+    6) Run cmap() specifying the key/label you have given your new colour map
+       with the diagnostics flag set to one.  Various plots are generated
+       allowing you to check the perceptual uniformity, colour map path,
+       and any gamut clipping of your colour map.
+
+    Reference: Peter Kovesi. Good Colour Maps: How to Design Them.
+    arXiv:1509.03700 [cs.GR] 2015.
+
+    October  2015 - Ported to Julia from MATLAB
+    December 2015 - Tweaked control points for some colour maps to keep them in gamut
+    November 2016 - Compatibility with 0.5, Mods to heat colour map
+    June     2018 - Updated and added some colour maps
+
+    ----------------------------------------------------------------------------=#
     cmap("all")    # List all colour maps available
 end
 
@@ -312,7 +311,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     # Definitions of key angles in Lab space for defining colours in colour
     # blind colour spaces. Angles are in degrees.
     yellow575 =  92.62  # For protanopic and deuteranopic colour space.
-    blue475   = -79.27 
+    blue475   = -79.27
 
     red660  =   32.36   # For tritanopic colour space.
     cyan485 = -138.73
@@ -633,14 +632,14 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     # Precompute a spiral of increasing chroma down through Lab space
     nsteps = 12
     ang1 = 120; ang2 = -60   # Linearly interpolate hue angle
-    ang = linspace(ang1, ang2, nsteps)
+    ang = range(ang1, stop=ang2, length=nsteps)
 
     # Interpolate chroma but use a 'gamma' of 0.5 to keep the colours more saturated.
     sat1 = 0; sat2 = 80
-    sat =  (linspace(sat1, sat2, nsteps)/sat2).^0.5 * sat2
+    sat =  (range(sat1, stop=sat2, length=nsteps)/sat2).^0.5 * sat2
 
     l1 = 100; l2 = 25        # Linearly interpolate lightness
-    l = linspace(l1, l2, nsteps)
+    l = range(l1, stop=l2, length=nsteps)
 
     colptarray = zeros(nsteps,3)
     for n=1:nsteps
@@ -662,19 +661,19 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     # Precompute a spiral of increasing chroma down through Lab space
     nsteps = 12
     ang1 = 120; ang2 = 35
-    ang = linspace(ang1, ang2, nsteps)
-    
+    ang = range(ang1, stop=ang2, length=nsteps)
+
     sat1 = 0; sat2 = 84
-    sat =  (linspace(sat1, sat2, nsteps)/sat2).^0.5 * sat2
-    
-    l1 = 100; l2 = 45       
-    l = linspace(l1, l2, nsteps)
-    
+    sat =  (range(sat1, stop=sat2, length=nsteps)/sat2).^0.5 * sat2
+
+    l1 = 100; l2 = 45
+    l = range(l1, stop=l2, length=nsteps)
+
     colptarray = zeros(nsteps,3)
     for n=1:nsteps
         colptarray[n,:] = [l[n]  ch2ab(sat[n], ang[n])]
     end
-    
+
     push!(cmapdef, "L18" =>
           newcolourmapdef(desc = "White-Yellow-Orange-Red, decreasing lightness with increasing saturation",
                           attributeStr = "linear",
@@ -685,24 +684,24 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
-    
+
     # White-Cyan-Magenta-Red, decreasing lightness with increasing saturation
     # Precompute a spiral of increasing chroma down through Lab space
     nsteps = 12
     ang1 = -140; ang2 = 40
-    ang = linspace(ang1, ang2, nsteps)
-    
+    ang = range(ang1, stop=ang2, length=nsteps)
+
     sat1 = 0; sat2 = 84
-    sat =  (linspace(sat1, sat2, nsteps)/sat2).^0.5 * sat2
-    
-    l1 = 100; l2 = 45       
-    l = linspace(l1, l2, nsteps)
-    
+    sat =  (range(sat1, stop=sat2, length=nsteps)/sat2).^0.5 * sat2
+
+    l1 = 100; l2 = 45
+    l = range(l1, stop=l2, length=nsteps)
+
     colptarray = zeros(nsteps,3)
     for n=1:nsteps
         colptarray[n,:] = [l[n]  ch2ab(sat[n], ang[n])]
     end
-    
+
     push!(cmapdef, "L19" =>
           newcolourmapdef(desc = "White-Cyan-Magenta-Red, decreasing lightness with increasing saturation",
                           attributeStr = "linear",
@@ -713,17 +712,17 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
-    
-    
+
+
     #--------------------------------------------------------------------------------
     ## Diverging colour maps
-    
+
     # Note that on these colour maps often we do not go to full white but use a
     # lightness value of 95. This helps avoid saturation problems on monitors.
     # A lightness smoothing sigma of 5 to 7 is used to avoid generating a false
     # feature at the white point in the middle.  Note however, this does create
     # a small perceptual contrast blind spot at the middle.
-    
+
     push!(cmapdef, "D1" =>
           newcolourmapdef(desc = "Diverging blue-white-red colour map",
                           attributeStr = "diverging",
@@ -1257,11 +1256,11 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0))
 
 
-    #---------------------------------------------------------------------------  
-    #= 
+    #---------------------------------------------------------------------------
+    #=
     Colour Maps for the Colour Blind
     Protanopic / Deuteranopic colour maps
-     
+
     The Protanopic / Deuteranopic colour space is represented by two planes.
     One plane is defined by the neutral axis and the colour point at yellow
     575nm, and the other defined by the neutral axis and the colour point at
@@ -1271,7 +1270,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     yellow 575nm =  1.6165 radians,  92.62 degrees
     blue   475nm = -1.3835 radians, -79.27 degrees
     =#
-     
+
     # Linear/diverging map for Protanopic/Deuteranopic viewers.  The
     # symmetry requirements for diverging maps means that the colours
     # are not as saturated as one would like. However this map works
@@ -1284,7 +1283,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           colpts = [5 0 0
                                     28 ch2ab(61, blue475)
                                     50 0 0
-                                    72 ch2ab(61, yellow575) 
+                                    72 ch2ab(61, yellow575)
                                     95 0 0],
                           splineorder = 3,
                           formula = "CIE76",
@@ -1310,7 +1309,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 9))
-      
+
     # Linear map up the blue edge of the colour space
     push!(cmapdef, "CBL3" =>
           newcolourmapdef(desc = "Linear blue map for Protanopic/Deuteranopic viewers",
@@ -1339,7 +1338,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 9))
-      
+
     # Diverging map blue-white-yellow.  Works well.
     push!(cmapdef, "CBD1" =>
           newcolourmapdef(desc = "Diverging map blue-white-yellow",
@@ -1367,7 +1366,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 5))
-      
+
     # 4-phase cyclic map blue-white-yellow-black
     push!(cmapdef, "CBC1" =>
           newcolourmapdef(desc = "4-phase cyclic map blue-white-yellow-black",
@@ -1397,7 +1396,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 5))
-      
+
     ## Tritanopic colour maps
     # Hue angles in a,b space of the key colours common to Tritanopic
     # and Trichromatic viewers.
@@ -1419,7 +1418,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 9))
-     
+
     # Tritanopic linear map, can also be used as a diverging
     # map. However the symmetry requirements of a diverging
     # map results in colours of lower chroma
@@ -1503,7 +1502,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           attributeStr = "cyclic-tritanopic",
                           hueStr = "wrwc",
                           colourspace = "LAB",
-                          colpts = [100 0 0   
+                          colpts = [100 0 0
                                     70 ch2ab(41, red660)
                                     100 0 0
                                     70 ch2ab(41, cyan485)],
@@ -1809,7 +1808,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     # Rely on the attribute string to identify if colour map is cyclic.  We may
     # want to construct a colour map that has identical endpoints but do not
     # necessarily want continuity in the slope of the colour map path.
-    if contains(lowercase(CM.attributeStr), "cyclic")
+    if occursin("cyclic", lowercase(CM.attributeStr))
         cyclic = true
         labspline = pbspline(CM.colpts', CM.splineorder, N)
     else
@@ -1827,19 +1826,19 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     # If specified apply a cyclic shift to the colour map
     if shift != 0
-        if !contains(lowercase(CM.attributeStr), "cyclic")
+        if !occursin("cyclic", lowercase(CM.attributeStr))
             warn("Colour map shifting being applied to a non-cyclic map")
         end
         map = circshift(map, round(Int, N*shift))
     end
 
     if reverse
-       map = flipdim(map, 1)
+       map = Base.reverse(map, dims=1)
     end
 
     # Compute mean chroma of colour map for use in the name construction
     lab = srgb2lab(map)
-    meanchroma = sum(sqrt.(sum(lab[:,2:3].^2, 2)))/N
+    meanchroma = sum(sqrt.(sum(lab[:,2:3].^2, dims=2)))/N
 
     # Construct lightness range description
     if uppercase(CM.colourspace) == "LAB"  # Use the control points
@@ -1854,8 +1853,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
         LStr = @sprintf("%d", minL)
 
     elseif L[1] == maxL &&
-                   (contains(lowercase(CM.attributeStr), "diverging") ||
-                    contains(lowercase(CM.attributeStr), "linear"))
+                   (occursin("diverging", lowercase(CM.attributeStr)) ||
+                    occursin("linear", lowercase(CM.attributeStr)))
         LStr = @sprintf("%d-%d", maxL, minL)
     else
         LStr = @sprintf("%d-%d", minL, maxL)
@@ -1881,7 +1880,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 =#
 
     # Build an array of ColorTypes.RGB values to return
-    rgbmap = Array{ColorTypes.RGBA{Float64}}(N)
+    rgbmap = Array{ColorTypes.RGBA{Float64}}(undef, N)
     for i = 1:N
         rgbmap[i] = ColorTypes.RGBA(map[i,1], map[i,2], map[i,3], 1.0)
     end
@@ -1929,7 +1928,7 @@ function catalogue(cmapdef, str="ALL")
         map, name, desc = cmap(label, returnname=true)
 
         if label[1] != 'X'   # do not list experimental maps
-            if !isempty(search(uppercase(name), str)) || str == "ALL"
+            if findfirst(str, uppercase(name)) !== nothing || str == "ALL"
                 @printf("%-10s  %s\n            ( %s )\n", label, desc, name)
                 found = true
             end
@@ -2061,12 +2060,10 @@ Them. [arXiv:1509.03700 [cs.GR] 2015](https://arXiv:1509.03700)
 See also: cmap, applycycliccolourmap, applydivergingcolourmap,
 sineramp, circlesineramp
 """
-
-# October  2015  - Ported from MATLAB to Julia
-
-function equalisecolourmap(rgblab::AbstractString, cmap::Array{Float64,2},
+function equalisecolourmap(rgblab::AbstractString, cmap::AbstractMatrix{Float64},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
                            sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+   # October  2015  - Ported from MATLAB to Julia
 
     N = size(cmap,1)   # No of colour map entries
 
@@ -2129,11 +2126,11 @@ function equalisecolourmap(rgblab::AbstractString, cmap::Array{Float64,2},
         # Form cumulative sum of of delta E values.  However, first ensure all
         # values are larger than 0.001 to ensure the cumulative sum always
         # increases.
-        deltaE[deltaE .< 0.001] = 0.001
-        cumdE = cumsum(deltaE)
+        deltaE[deltaE .< 0.001] .= 0.001
+        cumdE = cumsum(deltaE, dims=1)
 
         # Form an array of equal steps in cumulative contrast change.
-        equicumdE =  collect(0:(N-1))/(N-1) * (cumdE[end]-cumdE[1]) + cumdE[1]
+        equicumdE =  collect(0:(N-1))./(N-1) .* (cumdE[end]-cumdE[1]) .+ cumdE[1]
 
         # Solve for the locations that would give equal Delta E values.
         newN = interp1(cumdE, 1:N, equicumdE)
@@ -2250,7 +2247,7 @@ end
 
 # Case when colour map is an array of ColorTypes.RGB{Float64}
 
-function equalisecolourmap(rgblab::AbstractString, cmap::Array{ColorTypes.RGB{Float64},1},
+function equalisecolourmap(rgblab::AbstractString, cmap::AbstractVector{ColorTypes.RGB{Float64}},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
                            sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
 
@@ -2261,7 +2258,7 @@ end
 
 # Case when colour map is an array of ColorTypes.RGBA{Float64}
 
-function equalisecolourmap(rgblab::AbstractString, cmap::Array{ColorTypes.RGBA{Float64},1},
+function equalisecolourmap(rgblab::AbstractString, cmap::AbstractVector{ColorTypes.RGBA{Float64}},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
                            sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
 
@@ -2340,7 +2337,7 @@ end
 # across the end points in a cyclic manner.  It is assumed that the
 # input data is a column vector.
 
-function smooth{T<:Real}(L::Array{T,1}, sigma::Real, cyclic::Bool)
+function smooth(L::Array{T,1}, sigma::Real, cyclic::Bool) where {T<:Real}
 
     if cyclic
         Le = [L; L; L] # Form a concatenation of 3 repetitions of the array.
@@ -2355,7 +2352,7 @@ function smooth{T<:Real}(L::Array{T,1}, sigma::Real, cyclic::Bool)
 
         dL1 = L[2]-L[1]
         dL2 = L[end]-L[end-1]
-        Le = [-flipdim(dL1*extension,1)+L[1]; L;  dL2*extension+L[end]]
+        Le = [-reverse(dL1*extension,dims=1).+L[1]; L;  dL2*extension.+L[end]]
 
         Ls = gaussfilt1d(Le, sigma) # Apply smoothing filter
 
@@ -2445,8 +2442,7 @@ point of D65
 ```
 See also: lab2srgb
 """
-
-function srgb2lab{T}(rgb::Array{T,2})
+function srgb2lab(rgb::AbstractMatrix{T}) where {T}
 
     N = size(rgb,1)
     lab = zeros(N,3)
@@ -2468,7 +2464,7 @@ end
 #
 # Usage:  lab = srgb2lab(rgb)
 
-function srgb2lab{T}(rgb::Array{T,3})
+function srgb2lab(rgb::Array{T,3}) where {T}
 
     (rows, cols, chan) = size(rgb)
     lab = zeros(size(rgb))
@@ -2500,8 +2496,7 @@ point of D65
 ```
 See also: srgb2lab
 """
-
-function lab2srgb{T}(lab::Array{T,2})
+function lab2srgb(lab::AbstractMatrix{T}) where {T}
 
     N = size(lab,1)
     rgb = zeros(N,3)
@@ -2523,7 +2518,7 @@ end
 #
 # Usage:  rgb = lab2srgb(lab)
 
-function lab2srgb{T}(lab::Array{T,3})
+function lab2srgb(lab::Array{T,3}) where {T}
 
     (rows, cols, chan) = size(lab)
     rgb = zeros(size(lab))
@@ -2552,7 +2547,6 @@ for use as a colour map in Winston
 ```
 See also: cmap
 """
-
 function RGBA2UInt32(rgb::Vector{ColorTypes.RGBA{Float64}})
 
     N = length(rgb)
@@ -2627,7 +2621,7 @@ function FloatArray2RGBA(cmap::Array{Float64,2})
     (N,cols) = size(cmap)
     @assert cols == 3  "Color map data must be N x 3"
 
-    rgbmap = Array{ColorTypes.RGBA{Float64}}(N)
+    rgbmap = Array{ColorTypes.RGBA{Float64}}(undef, N)
     for i = 1:N
         rgbmap[i] = ColorTypes.RGBA(cmap[i,1], cmap[i,2], cmap[i,3],1.0)
     end
@@ -2643,7 +2637,7 @@ function RGB2FloatArray(rgbmap::Array{ColorTypes.RGBA{Float64},1})
 
     N = length(rgbmap)
 
-    cmap = Array{Float64}(N,3)
+    cmap = Array{Float64}(undef,N,3)
     for i = 1:N
         cmap[i,:] = [rgbmap[i].r rgbmap[i].g rgbmap[i].b]
     end
@@ -2659,7 +2653,7 @@ function RGBA2FloatArray(rgbmap::Array{ColorTypes.RGBA{Float64},1})
 
     N = length(rgbmap)
 
-    cmap = Array{Float64}(N,3)
+    cmap = Array{Float64}(undef,N,3)
     for i = 1:N
         cmap[i,:] = [rgbmap[i].r rgbmap[i].g rgbmap[i].b]
     end

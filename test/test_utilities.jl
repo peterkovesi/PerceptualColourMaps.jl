@@ -8,7 +8,7 @@
 println("testing utilites")
 
 using PerceptualColourMaps
-using Base.Test
+using Test, Statistics
 
 # bbspline
 P = [0 1 2 3
@@ -24,7 +24,7 @@ dx = S[1, 2:end] - S[1, 1:(end-1)]
 dy = S[2, 2:end] - S[2, 1:(end-1)]
 
 slope = dy./dx
-@test maximum(slope - 1) < 1e-3
+@test maximum(slope .- 1) < 1e-3
 
 # pbspline
 P = [0 1 2 3 0
@@ -72,10 +72,10 @@ maxval = maximum(htimg)
 # Check that the number of saturated pixels at each extreme is
 # approximately lHistCut and uHistCut. Note some integer rounding has
 # to occur.
-v = find(abs.(htimg-minval).<eps())
+v = findall(abs.(htimg.-minval).<eps())
 @test abs(length(v)/(rows*cols) * 100 - lHistCut) < 1
 
-v = find(abs.(htimg-maxval).<eps())
+v = findall(abs.(htimg.-maxval).<eps())
 @test abs(length(v)/(rows*cols) * 100 - uHistCut) < 1
 
 # sineramp
@@ -85,4 +85,3 @@ sr = sineramp((256, 512), 12.5, 8, 2)
 # circlesineramp
 (img, alpha) = circlesineramp()
 (img, alpha) = circlesineramp(512, pi/10, 8, 2, false)
-

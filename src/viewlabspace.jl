@@ -40,12 +40,10 @@ points for the definition of colourmap paths through CIELAB space in cmap().
 
 See also: colourmappath, cmap
 """
-
-# March 2013
-# November 2013  Interactive CIELAB coordinate feedback from mouse position
-# December 2015  Ported from MATLAB to Julia but loses interactivity...
-
 function viewlabspace(L=50, figNo=1)
+    # March 2013
+    # November 2013  Interactive CIELAB coordinate feedback from mouse position
+    # December 2015  Ported from MATLAB to Julia but loses interactivity...
 
     # Define some reference colours in rgb
     rgb = [1 0 0
@@ -67,7 +65,7 @@ function viewlabspace(L=50, figNo=1)
 
     # Obtain cylindrical coordinates in lab space
     labradius = sqrt(labv[:,2].^2+labv[:,3].^2)
-    labtheta = atan2(labv[:,3], labv[:,2])
+    labtheta = atan(labv[:,3], labv[:,2])
 
     # Define a*b* grid for image
     scale = 2;

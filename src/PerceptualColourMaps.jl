@@ -18,6 +18,7 @@ PK October 2015
 
 
 ----------------------------------------------------------------------------=#
+
 """
 **PerceptualColourMaps**
 
@@ -61,6 +62,7 @@ Peter Kovesi
 """
 module PerceptualColourMaps
 
+using Printf, LinearAlgebra, Statistics
 using Images
 
 include("cmap.jl")
