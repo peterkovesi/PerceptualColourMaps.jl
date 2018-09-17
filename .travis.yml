@@ -4,7 +4,8 @@ os:
   - linux
   - osx
 julia:
-  - 0.6
+  - 0.7
+  - 1.0
   - nightly
 notifications:
   email: false
@@ -14,4 +15,4 @@ matrix:
   allow_failures:
   - julia: nightly
 script:
-  - julia -e 'Pkg.clone(pwd()); ENV["PYTHON"]=""; Pkg.build("PyCall"); Pkg.build("PerceptualColourMaps"); Pkg.test("PerceptualColourMaps"; coverage=true)'
+  - julia -e 'using Pkg; Pkg.clone(pwd()); ENV["PYTHON"]=""; Pkg.build("PyCall"); Pkg.build("PerceptualColourMaps"); Pkg.test("PerceptualColourMaps"; coverage=true)'
