@@ -2137,14 +2137,14 @@ function equalisecolourmap(rgblab::AbstractString, cmap::AbstractMatrix{Float64}
 
         # newN now represents the locations where we want to interpolate into the
         # colour map to obtain constant perceptual contrast
-        Li = interpolate(L, BSpline(Linear()), OnCell())
-        L = [Li[v] for v in newN]
+        Li = interpolate(L, BSpline(Linear()))
+        L = [Li(v) for v in newN]
 
-        ai = interpolate(a, BSpline(Constant()), OnCell())
-        a = [ai[v] for v in newN]
+        ai = interpolate(a, BSpline(Constant()))
+        a = [ai(v) for v in newN]
 
-        bi = interpolate(b, BSpline(Constant()), OnCell())
-        b = [bi[v] for v in newN]
+        bi = interpolate(b, BSpline(Constant()))
+        b = [bi(v) for v in newN]
 
         # Record initial colour differences for evaluation at the end
         if iter == 1
