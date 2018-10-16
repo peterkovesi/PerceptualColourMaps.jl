@@ -11,16 +11,16 @@ PerceptualColourMaps
 
 ## Installation
 
-Install via the package manager.  Currently the package only runs under v0.6
+Install via the package manager.
 
 ```
-julia>  Pkg.add("PerceptualColourMaps")
+pkg> add PerceptualColourMaps
 ```
 
 If you are after the latest master use:
 
 ```
-julia>  Pkg.clone("https://github.com/peterkovesi/PerceptualColourMaps.jl")
+pkg> add PerceptualColourMaps#master
 ```
 
 
