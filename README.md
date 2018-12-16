@@ -293,3 +293,4 @@ from which this Julia code was ported.
   prepared for use with a number of standard visualisation packages.
 * Reference: Peter Kovesi. Good Colour Maps: How to Design Them.
   [arXiv:1509.03700 [cs.GR] 2015](https://arxiv.org/abs/1509.03700)
+* [Conference presentation](https://peterkovesi.com/papers/ColourMapsForColourBlindIAMG2017.pdf) describing the design of colour maps for the colour blind.
