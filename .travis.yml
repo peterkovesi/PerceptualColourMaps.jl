@@ -17,5 +17,5 @@ git:
 matrix:
   allow_failures:
   - julia: nightly
-script:
-  - julia -e 'using Pkg; Pkg.clone(pwd()); ENV["PYTHON"]=""; Pkg.build("PyCall"); Pkg.build("PerceptualColourMaps"); Pkg.test("PerceptualColourMaps"; coverage=true)'
+env:
+  PYTHON=
