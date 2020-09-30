@@ -19,7 +19,8 @@ export lab2srgb, srgb2lab, RGBA2UInt32
 export RGB2FloatArray, RGBA2FloatArray
 export FloatArray2RGB, FloatArray2RGBA
 
-import Colors, ColorTypes, PyPlot
+import Images, PyPlot
+import Images.ColorTypes, Images.Colors
 using Interpolations
 
 # There seems to be a fatal clash between PyPlot and Tk.  ImageView
@@ -2410,15 +2411,15 @@ function ciede2000(L::Array, a::Array, b::Array, W::Array)
 
     # Compute deltaE using central differences
     for i = 2:N-1
-        deltaE[i] = Colors.colordiff(Colors.Lab(L[i+1],a[i+1],b[i+1]), Colors.Lab(L[i-1],a[i-1],b[i-1]),
-                                     Colors.DE_2000(kl,kc,kh))/2
+        deltaE[i] = Colors.colordiff(Colors.Lab(L[i+1],a[i+1],b[i+1]), Colors.Lab(L[i-1],a[i-1],b[i-1]);
+                                     metric=Colors.DE_2000(kl,kc,kh))/2
     end
 
     # Differences at end points
-    deltaE[1] = Colors.colordiff(Colors.Lab(L[2],a[2],b[2]), Colors.Lab(L[1],a[1],b[1]),
-                                  Colors.DE_2000(kl,kc,kh))
-    deltaE[N] = Colors.colordiff(Colors.Lab(L[N],a[N],b[N]), Colors.Lab(L[N-1],a[N-1],b[N-1]),
-                                  Colors.DE_2000(kl,kc,kh))
+    deltaE[1] = Colors.colordiff(Colors.Lab(L[2],a[2],b[2]), Colors.Lab(L[1],a[1],b[1]);
+                                 metric = Colors.DE_2000(kl,kc,kh))
+    deltaE[N] = Colors.colordiff(Colors.Lab(L[N],a[N],b[N]), Colors.Lab(L[N-1],a[N-1],b[N-1]);
+                                 metric=Colors.DE_2000(kl,kc,kh))
 
     return deltaE
 end

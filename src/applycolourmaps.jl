@@ -14,7 +14,8 @@ The Software is provided "as is", without warranty of any kind.
 
 ----------------------------------------------------------------------------=#
 
-import ColorTypes, Images
+import Images
+import Images.ColorTypes
 
 export applycolourmap, applydivergingcolourmap, applycycliccolourmap, ternaryimage
 export applycolormap, applydivergingcolormap, applycycliccolormap
@@ -107,7 +108,7 @@ end
 
 # Case for img::ImageMeta
 function applycolourmap(img::ImageMeta{T,2}, cmap, rnge) where T
-    rgbimg = applycolourmap(float(Images.data(img)), cmap, rnge)
+    rgbimg = applycolourmap(float(Images.arraydata(img)), cmap, rnge)
     return ImageMeta(rgbimg, colordim = 3, colorspace=Images.RGB,
                         spatialorder = img.properties["spatialorder"])
 end
@@ -155,7 +156,7 @@ end
 
 # Case for img::ImageMeta
 function applycolormap(img::ImageMeta{T,2}, cmap, rnge) where T
-    rgbimg = applycolourmap(float(Images.data(img)), cmap, rnge)
+    rgbimg = applycolourmap(float(Images.arraydata(img)), cmap, rnge)
     return ImageMeta(rgbimg, colordim = 3, colorspace=Images.RGB,
                      spatialorder = img.properties["spatialorder"])
 end
@@ -250,7 +251,7 @@ end
 function ternaryimage(img::ImageMeta{T,3};
                       bands::Array = [1, 2, 3], histcut::Real = 0.0, RGB::Bool=false) where T
 
-    rgbimg = ternaryimage(float(Images.data(img)), bands=bands, histcut=histcut, RGB=RGB)
+    rgbimg = ternaryimage(float(Images.arraydata(img)), bands=bands, histcut=histcut, RGB=RGB)
     return ImageMeta(rgbimg, colordim = 3, colorspace=Images.RGB, spatialorder = img.properties["spatialorder"])
 end
 
@@ -343,7 +344,7 @@ end
 function applycycliccolourmap(img::ImageMeta{T1,2}, cmap::Array{ColorTypes.RGBA{Float64},1};
                           amp::ImageMeta{T2,2}=ImageMeta(Array{Float64}(undef, 0,0)),
                           cyclelength::Real=2*pi, modtoblack::Bool=true) where {T1,T2}
-    rgbimg = applycycliccolourmap(float(Images.data(img)), cmap, amp=float(Images.data(amp)),
+    rgbimg = applycycliccolourmap(float(Images.arraydata(img)), cmap, amp=float(Images.arraydata(amp)),
                    cyclelength=cyclelength, modtoblack=modtoblack)
     return ImageMeta(rgbimg, colordim = 3, colorspace=Images.RGB, spatialorder = img.properties["spatialorder"])
 end
