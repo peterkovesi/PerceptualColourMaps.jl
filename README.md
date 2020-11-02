@@ -93,9 +93,9 @@ Arguments for Usage 1 and 2:
                 for.  Type 'cmap()' with no arguments to get a full list of
                 possible colour maps and their corresponding labels.
 
-  labels:  "L1" - "L15"  for linear maps
+  labels:  "L1" - "L19"  for linear maps
            "D1" - "D12"  for diverging maps
-           "C1" - "C9"   for cyclic maps
+           "C1" - "C11"  for cyclic maps
            "R1" - "R3"   for rainbow maps
            "I1" - "I3"   for isoluminant maps
 
