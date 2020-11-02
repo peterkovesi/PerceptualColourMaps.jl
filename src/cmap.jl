@@ -87,7 +87,7 @@ Arguments for Usage 1 and 2:
 
   labels:  "L1" - "L19"  for linear maps
            "D1" - "D13"  for diverging maps
-           "C1" - "C9"   for cyclic maps
+           "C1" - "C11"  for cyclic maps
            "R1" - "R3"   for rainbow maps
            "I1" - "I3"   for isoluminant maps
 
@@ -300,6 +300,7 @@ function cmap()
     December 2015 - Tweaked control points for some colour maps to keep them in gamut
     November 2016 - Compatibility with 0.5, Mods to heat colour map
     June     2018 - Updated and added some colour maps
+    November 2020 - Added C10, C11, slight tweak to L16, 2-digit naming allowed for.
 
     ----------------------------------------------------------------------------=#
     cmap("all")    # List all colour maps available
@@ -339,6 +340,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     push!(cmapdef, "GREY" => cmapdef["L1"])  # Convenience name
     push!(cmapdef, "GRAY" => cmapdef["L1"])  # Convenience name
+    push!(cmapdef, "L01" => cmapdef["L1"])    # Convenience name
 
     #  Grey 10 - 95  "REDUCEDGREY"
     push!(cmapdef, "L2" =>
@@ -356,6 +358,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     push!(cmapdef, "REDUCEDGREY" => cmapdef["L2"])
     push!(cmapdef, "REDUCEDGRAY" => cmapdef["L2"])
+    push!(cmapdef, "L02" => cmapdef["L2"])
 
     # HEATWHITE
     # Heat map from straight line segments from black to red to yellow
@@ -378,6 +381,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0))
 
     push!(cmapdef, "HEAT" => cmapdef["L3"])  # Convenience name
+    push!(cmapdef, "L03" => cmapdef["L3"])
 
     # "HEATYELLOW"
     push!(cmapdef, "L4" =>
@@ -395,7 +399,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0.0))
 
     push!(cmapdef, "HEATYELLOW" => cmapdef["L4"])  # Convenience name
-
+    push!(cmapdef, "L04" => cmapdef["L4"])
 
     push!(cmapdef, "L5" =>
           newcolourmapdef(desc = "Colour map along the green edge of CIELAB space",
@@ -417,6 +421,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 0.0))
 
+    push!(cmapdef, "L05" => cmapdef["L5"])
+    
     push!(cmapdef, "L6" =>
           newcolourmapdef(desc = "Blue shades running vertically up the blue edge of CIELAB space",
                           attributeStr = "linear",
@@ -437,6 +443,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 0))
 
+    push!(cmapdef, "L06" => cmapdef["L6"])
+    
     push!(cmapdef, "L7" =>
           newcolourmapdef(desc = "Blue-Pink-Light Pink colour map",
                           attributeStr = "linear",
@@ -457,6 +465,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 0))
 
+    push!(cmapdef, "L07" => cmapdef["L7"])
+    
     push!(cmapdef, "L8" =>
           newcolourmapdef(desc = "Blue-Magenta-Orange-Yellow highly saturated colour map",
                           attributeStr = "linear",
@@ -477,7 +487,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0))
 
     push!(cmapdef, "BMY" => cmapdef["L8"])  # Convenience name
-
+    push!(cmapdef, "L08" => cmapdef["L8"])
+    
     # Blue to yellow section of R1 with short extensions at each end
     push!(cmapdef, "L9" =>
           newcolourmapdef(desc = "Blue to yellow colour map",
@@ -497,7 +508,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0))
 
     push!(cmapdef, "BGYW" => cmapdef["L9"])  # Convenience name
-
+    push!(cmapdef, "L09" => cmapdef["L9"])
+    
    # GEOGRAPHIC1
     push!(cmapdef, "L10" =>
           newcolourmapdef(desc = "A 'geographical' colour map.  " *
@@ -616,7 +628,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           attributeStr = "linear",
                           hueStr = "kbgyw",
                           colourspace = "LAB",
-                          colpts = [  5   0   0
+                          colpts = [ 10   0   0
                                      20  59 -80
                                      35  28 -66
                                      45 -14 -29
@@ -738,6 +750,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 7))
 
     push!(cmapdef, "COOLWARM" => cmapdef["D1"])
+    push!(cmapdef, "D01" => cmapdef["D1"])
 
     # Variation on D1 with darker end point colours
     push!(cmapdef, "D1A" =>
@@ -757,6 +770,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 7))
 
+    push!(cmapdef, "D01A" => cmapdef["D1A"])
+    
     push!(cmapdef, "D2" =>
           newcolourmapdef(desc = "Diverging green-white-violet colour map",
                           attributeStr = "diverging",
@@ -769,6 +784,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 7))
+
+    push!(cmapdef, "D02" => cmapdef["D2"])
 
     push!(cmapdef, "D3" =>
           newcolourmapdef(desc = "Diverging green-white-red colour map",
@@ -783,6 +800,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 7))
 
+    push!(cmapdef, "D03" => cmapdef["D3"])
+
     push!(cmapdef, "D4" =>
           newcolourmapdef(desc = "Diverging blue - black - red colour map",
                           attributeStr = "diverging",
@@ -795,6 +814,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 7))
+
+    push!(cmapdef, "D04" => cmapdef["D4"])
 
     push!(cmapdef, "D5" =>
           newcolourmapdef(desc = "Diverging green - black - red colour map",
@@ -809,6 +830,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 7))
 
+    push!(cmapdef, "D05" => cmapdef["D5"])
+
     push!(cmapdef, "D6" =>
           newcolourmapdef(desc = "Diverging blue - black - yellow colour map",
                           attributeStr = "diverging",
@@ -821,6 +844,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 7))
+
+    push!(cmapdef, "D06" => cmapdef["D6"])
 
     # Linear diverging  blue - grey - yellow.  Works well
     push!(cmapdef, "D7" =>
@@ -839,6 +864,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0))
 
     push!(cmapdef, "DIBBGY" => cmapdef["D7"])
+    push!(cmapdef, "D07" => cmapdef["D7"])
 
     # Linear diverging blue - grey - yellow.  Similar to 'D7' but
     # with slight curves in the path to slightly increase the chroma
@@ -863,6 +889,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 0))
 
+    push!(cmapdef, "D07B" => cmapdef["D7B"])
+
     push!(cmapdef, "D8" =>
           newcolourmapdef(desc="Linear diverging  blue - grey - red",
                           attributeStr = "diverging-linear",
@@ -875,6 +903,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
+
+    push!(cmapdef, "D08" => cmapdef["D8"])
 
     # Lightened version of D1 for relief shading - Good.
     push!(cmapdef, "D9" =>
@@ -889,6 +919,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 2)) # Less smoothing needed for low contrast
+
+    push!(cmapdef, "D09" => cmapdef["D9"])
 
     # Low contrast diverging map for when you want to use relief
     # shading
@@ -936,7 +968,6 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 7))
-
 
     # Pleasing Blue-White-Green diverging map
     push!(cmapdef, "D13" =>
@@ -989,6 +1020,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 7))
 
+    push!(cmapdef, "C01" => cmapdef["C1"])
+
     # A big diamond across the gamut.  Really good!  Incorporates two
     # extra cotnrol points around blue to extend the width of that
     # segment slightly.
@@ -1011,6 +1044,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 7))
 
     push!(cmapdef, "PHASE4" => cmapdef["C2"])
+    push!(cmapdef, "C02" => cmapdef["C2"])
 
     # red-white-blue-black-red allows quadrants to be identified
     push!(cmapdef, "C3" =>
@@ -1027,6 +1061,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 7))
+
+    push!(cmapdef, "C03" => cmapdef["C3"])
 
     # white-red-white-blue-white Works nicely
     push!(cmapdef, "C4" =>
@@ -1045,6 +1081,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 7))
 
     push!(cmapdef, "PHASE2" => cmapdef["C4"])
+    push!(cmapdef, "C04" => cmapdef["C4"])
 
     #  "CYCLICGREY"  Cyclic greyscale  Works well
     push!(cmapdef, "C5" =>
@@ -1060,6 +1097,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 7))
+
+    push!(cmapdef, "C05" => cmapdef["C5"])
 
     # Circle at lightness 67  - sort of ok but a bit flouro
     chr = 40
@@ -1080,6 +1119,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 1, 1],
                           sigma = 0))
 
+    push!(cmapdef, "C06" => cmapdef["C6"])
+
     # Elliptical path - ok
     ang = 112
 
@@ -1097,6 +1138,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 0))
+
+    push!(cmapdef, "C07" => cmapdef["C7"])
 
     # Elliptical path.  Greater range of lightness values and slightly
     # more saturated colours.  Seems to work however I do not find the
@@ -1119,10 +1162,11 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 1, 1],
                           sigma = 7))
 
-
-   # Variation of C1. Perceptually this is good. Excellent balance of
-   # colours in the quadrants but the colour mix is not to my taste.
-   # Don't like the green.  The red-green transition clashes
+    push!(cmapdef, "C08" => cmapdef["C8"])
+ 
+    # Variation of C1. Perceptually this is good. Excellent balance of
+    # colours in the quadrants but the colour mix is not to my taste.
+    # Don't like the green.  The red-green transition clashes
     blu = [35  70 -100]
 
     push!(cmapdef, "C9" =>
@@ -1139,6 +1183,59 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 7))
+
+    push!(cmapdef, "C09" => cmapdef["C9"])
+
+    # Zig-Zag Yellow - Magenta - Cyan - Green - Yellow.
+    # Colours are well balanced over the quadrants, my new favourite.
+    y90 = [90 -20 90]
+    c90 = [90 -48 -14]
+    m60 = [60 98 -61]
+    g60 = [60 -64 61]
+
+    push!(cmapdef, "C10" =>
+          newcolourmapdef(desc="Cyclic Yellow - Magenta - Cyan - Green - Yellow",
+                          attributeStr = "cyclic",
+                          hueStr = "ymcgy",
+                          colourspace = "LAB",
+                          colpts = [y90
+                                    m60
+                                    c90
+                                    g60
+                                    y90],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 5))
+
+     # Try a six colour map. A colour wheel with Yellow, Cyan and Magenta at a
+     # lightness of 90. (Magenta gets washed out with little chroma at 90), and
+     # Red, Green and Blue at a lightness of 50. The Green is a bit dark and the
+     # blue a bit light at 50. Overall a slightly strange colour circle but I
+     # think it works quite well.
+     y90 = [90 -7 90]
+     m90 = [90 24 -17]
+     c90 = [90 -48 -14]
+     r50 = [50 78 62]
+     b50 = [50 30 -81]
+     g50 = [50 -54 52]
+         
+     push!(cmapdef, "C11" =>
+        newcolourmapdef(desc = "Six colour cyclic with primaries and secondaries matched in lightness",
+                        attributeStr = "cyclic",
+                        hueStr = "rygcbmr",
+                        colourspace = "LAB",
+                        colpts = [r50
+                                  y90
+                                  g50
+                                  c90
+                                  b50
+                                  m90
+                                  r50],
+                        splineorder = 2,
+                        formula = "CIE76",
+                        W = [1, 0, 0],
+                        sigma = 7))                        
 
 
     #-----------------------------------------------------------------------------
@@ -1164,6 +1261,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 7))
 
     push!(cmapdef, "RAINBOW" => cmapdef["R1"])
+    push!(cmapdef, "R01" => cmapdef["R1"])
 
     # "RAINBOW2" Similar to R1 but with the colour map finishing at
     # red rather than continuing onto pink.
@@ -1184,6 +1282,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 5))
 
     push!(cmapdef, "RAINBOW2" => cmapdef["R2"])
+    push!(cmapdef, "R02" => cmapdef["R2"])
 
     # Diverging rainbow.  The blue and red points are matched in
     # lightness and chroma as are the green and magenta points
@@ -1206,6 +1305,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 5))
 
     push!(cmapdef, "RAINBOW3" => cmapdef["R3"])
+    push!(cmapdef, "R03" => cmapdef["R3"])
 
     #-----------------------------------------------------------------------------
     ##  Isoluminant colour maps
@@ -1225,6 +1325,8 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 1, 1],
                           sigma = 0))
 
+    push!(cmapdef, "I01" => cmapdef["I1"])
+
     # Adaptation of I1 shifted to 80 from 70
     push!(cmapdef, "I2" =>
           newcolourmapdef(desc = "Isoluminant blue to green to orange at lightness 80.  " *
@@ -1241,6 +1343,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 1, 1],
                           sigma = 0))
 
+    push!(cmapdef, "I02" => cmapdef["I2"])
 
     push!(cmapdef, "I3" =>
           newcolourmapdef(desc = "Isoluminant cyan to magenta colour map",
@@ -1256,6 +1359,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 1, 1],
                           sigma = 0))
 
+    push!(cmapdef, "I03" => cmapdef["I3"])
 
     #---------------------------------------------------------------------------
     #=
