@@ -88,7 +88,7 @@ Arguments for Usage 1 and 2:
   labels:  "L1" - "L19"  for linear maps
            "D1" - "D13"  for diverging maps
            "C1" - "C11"  for cyclic maps
-           "R1" - "R3"   for rainbow maps
+           "R1" - "R4"   for rainbow maps
            "I1" - "I3"   for isoluminant maps
 
   labels for generating maps for the colour blind:
@@ -1306,6 +1306,31 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     push!(cmapdef, "RAINBOW3" => cmapdef["R3"])
     push!(cmapdef, "R03" => cmapdef["R3"])
+
+    # More vivid version of R2 with greater range of luminance.  Looks more
+    # attractive, however I find the vivid colours tend to make you segment
+    # regions in your data on the basis of colour and you can lose the overall
+    # sense of structure.
+    push!(cmapdef, "R4" =>
+          newcolourmapdef(desc = "Vivid rainbow colour map from blue to red",
+                       attributeStr = "rainbow",
+                       hueStr = "bgyr",
+                       colourspace = "LAB",
+                       colpts = [10 42 -57
+                                 20 59 -80
+                                 40 55 -93
+                                 50 -23 -25
+                                 60 -60 60
+                                 90 -12 89
+                                 70 33 72
+                                 55 75 65
+                                 45 70 55],
+                       splineorder = 2,
+                       formula = "CIE76",
+                       W = [1, 0, 0],
+                       sigma = 5))                       
+
+    push!(cmapdef, "R04" => cmapdef["R4"])
 
     #-----------------------------------------------------------------------------
     ##  Isoluminant colour maps

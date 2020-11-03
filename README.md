@@ -96,7 +96,7 @@ Arguments for Usage 1 and 2:
   labels:  "L1" - "L19"  for linear maps
            "D1" - "D12"  for diverging maps
            "C1" - "C11"  for cyclic maps
-           "R1" - "R3"   for rainbow maps
+           "R1" - "R4"   for rainbow maps
            "I1" - "I3"   for isoluminant maps
 
  Some colour maps have alternate labels for convenience and readability.
