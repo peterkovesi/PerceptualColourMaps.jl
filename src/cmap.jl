@@ -1048,15 +1048,15 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     # red-white-blue-black-red allows quadrants to be identified
     push!(cmapdef, "C3" =>
-          newcolourmapdef(desc = "Cyclic: red - white - blue - black - red",
+          newcolourmapdef(desc = "Cyclic: white - red - black - blue",
                           attributeStr = "cyclic",
-                          hueStr = "rwbkr",
+                          hueStr = "wrkbw",
                           colourspace = "LAB",
-                          colpts = [50 ch2ab(85, 39)
-                                    85 0 0
-                                    50 ch2ab(85, -70)
-                                    15 0 0
-                                    50 ch2ab(85, 39)],
+                          colpts = [90  0   0
+                                    50 65  56
+                                    10  0   0
+                                    50 31 -80
+                                    90  0   0],
                           splineorder = 2,
                           formula = "CIE76",
                           W = [1, 0, 0],
@@ -1100,91 +1100,40 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
 
     push!(cmapdef, "C05" => cmapdef["C5"])
 
-    # Circle at lightness 67  - sort of ok but a bit flouro
-    chr = 40
-    ang = 124
 
+    # A six colour map. A colour wheel with Yellow, Cyan and Magenta at a
+    # lightness of 90. (Magenta gets washed out with little chroma at 90), and
+    # Red, Green and Blue at a lightness of 50. The Green is a bit dark and the
+    # blue a bit light at 50. Overall a slightly strange colour circle but I
+    # think it works quite well.
+    y90 = [90 -7 90]
+    m90 = [90 24 -17]
+    c90 = [90 -48 -14]
+    r50 = [50 78 62]
+    b50 = [50 30 -81]
+    g50 = [50 -54 52]
+         
     push!(cmapdef, "C6" =>
-          newcolourmapdef(desc="Cyclic isoluminant circle at lighhtness 67",
-                          attributeStr = "cyclic-isoluminant",
-                          hueStr = "mgbm",
-                          colourspace = "LAB",
-                          colpts = [67  ch2ab(chr,  ang-90)
-                                    67  ch2ab(chr,  ang)
-                                    67  ch2ab(chr,  ang+90)
-                                    67  ch2ab(chr,  ang+180)
-                                    67  ch2ab(chr,  ang-90)],
-                          splineorder = 2,
-                          formula = "CIE76",
-                          W = [1, 1, 1],
-                          sigma = 0))
+       newcolourmapdef(desc = "Six colour cyclic with primaries and secondaries matched in lightness",
+                       attributeStr = "cyclic",
+                       hueStr = "rygcbmr",
+                       colourspace = "LAB",
+                       colpts = [r50
+                                 y90
+                                 g50
+                                 c90
+                                 b50
+                                 m90
+                                 r50],
+                       splineorder = 2,
+                       formula = "CIE76",
+                       W = [1, 0, 0],
+                       sigma = 7))                        
 
     push!(cmapdef, "C06" => cmapdef["C6"])
 
-    # Elliptical path - ok
-    ang = 112
 
-    push!(cmapdef, "C7" =>
-          newcolourmapdef(desc="Cyclic map formed from an ellipse",
-                          attributeStr = "cyclic",
-                          hueStr = "mygbm",
-                          colourspace = "LAB",
-                          colpts = [70    ch2ab(42,  ang-90)
-                                    90    ch2ab(82,  ang)
-                                    70    ch2ab(42,  ang+90)
-                                    50    ch2ab(82,  ang+180)
-                                    70    ch2ab(42,  ang-90)],
-                          splineorder = 2,
-                          formula = "CIE76",
-                          W = [1, 1, 1],
-                          sigma = 0))
 
-    push!(cmapdef, "C07" => cmapdef["C7"])
-
-    # Elliptical path.  Greater range of lightness values and slightly
-    # more saturated colours.  Seems to work however I do not find the
-    # colour sequence that attractive. This is a constraint of the
-    # gamut.
-    ang = 124
-
-    push!(cmapdef, "C8" =>
-          newcolourmapdef(desc="Cyclic map formed from an ellipse",
-                          attributeStr = "cyclic",
-                          hueStr = "mybm",
-                          colourspace = "LAB",
-                          colpts = [60    ch2ab(36,  ang-90)
-                                    95    ch2ab(90,  ang)
-                                    60    ch2ab(36,  ang+90)
-                                    25    ch2ab(90,  ang+180)
-                                    60    ch2ab(36,  ang-90)],
-                          splineorder = 2,
-                          formula = "CIE76",
-                          W = [1, 1, 1],
-                          sigma = 7))
-
-    push!(cmapdef, "C08" => cmapdef["C8"])
- 
-    # Variation of C1. Perceptually this is good. Excellent balance of
-    # colours in the quadrants but the colour mix is not to my taste.
-    # Don't like the green.  The red-green transition clashes
-    blu = [35  70 -100]
-
-    push!(cmapdef, "C9" =>
-          newcolourmapdef(desc="Cyclic blue-green-red-magenta-blue colour map",
-                          attributeStr = "cyclic",
-                          hueStr = "bgrmb",
-                          colourspace = "LAB",
-                          colpts = [blu
-                                    70 -70 64
-                                    35 65 50
-                                    70 75 -46
-                                    blu        ],
-                          splineorder = 2,
-                          formula = "CIE76",
-                          W = [1, 0, 0],
-                          sigma = 7))
-
-    push!(cmapdef, "C09" => cmapdef["C9"])
 
     # Zig-Zag Yellow - Magenta - Cyan - Green - Yellow.
     # Colours are well balanced over the quadrants, my new favourite.
@@ -1193,7 +1142,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     m60 = [60 98 -61]
     g60 = [60 -64 61]
 
-    push!(cmapdef, "C10" =>
+    push!(cmapdef, "C7" =>
           newcolourmapdef(desc="Cyclic Yellow - Magenta - Cyan - Green - Yellow",
                           attributeStr = "cyclic",
                           hueStr = "ymcgy",
@@ -1208,34 +1157,90 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           W = [1, 0, 0],
                           sigma = 5))
 
-     # Try a six colour map. A colour wheel with Yellow, Cyan and Magenta at a
-     # lightness of 90. (Magenta gets washed out with little chroma at 90), and
-     # Red, Green and Blue at a lightness of 50. The Green is a bit dark and the
-     # blue a bit light at 50. Overall a slightly strange colour circle but I
-     # think it works quite well.
-     y90 = [90 -7 90]
-     m90 = [90 24 -17]
-     c90 = [90 -48 -14]
-     r50 = [50 78 62]
-     b50 = [50 30 -81]
-     g50 = [50 -54 52]
-         
-     push!(cmapdef, "C11" =>
-        newcolourmapdef(desc = "Six colour cyclic with primaries and secondaries matched in lightness",
-                        attributeStr = "cyclic",
-                        hueStr = "rygcbmr",
-                        colourspace = "LAB",
-                        colpts = [r50
-                                  y90
-                                  g50
-                                  c90
-                                  b50
-                                  m90
-                                  r50],
-                        splineorder = 2,
-                        formula = "CIE76",
-                        W = [1, 0, 0],
-                        sigma = 7))                        
+    push!(cmapdef, "C07" => cmapdef["C7"])
+
+
+    # Elliptical path - ok
+    ang = 112
+
+    push!(cmapdef, "C8" =>
+          newcolourmapdef(desc="Cyclic map formed from an ellipse",
+                          attributeStr = "cyclic",
+                          hueStr = "mygbm",
+                          colourspace = "LAB",
+                          colpts = [70    ch2ab(42,  ang-90)
+                                    90    ch2ab(82,  ang)
+                                    70    ch2ab(42,  ang+90)
+                                    50    ch2ab(82,  ang+180)
+                                    70    ch2ab(42,  ang-90)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 1, 1],
+                          sigma = 0))
+
+    push!(cmapdef, "C08" => cmapdef["C8"])
+
+    # Elliptical path.  Greater range of lightness values and slightly
+    # more saturated colours.  Seems to work however I do not find the
+    # colour sequence that attractive. This is a constraint of the
+    # gamut.
+    ang = 124
+
+    push!(cmapdef, "C9" =>
+          newcolourmapdef(desc="Cyclic map formed from an ellipse",
+                          attributeStr = "cyclic",
+                          hueStr = "mybm",
+                          colourspace = "LAB",
+                          colpts = [60    ch2ab(36,  ang-90)
+                                    95    ch2ab(90,  ang)
+                                    60    ch2ab(36,  ang+90)
+                                    25    ch2ab(90,  ang+180)
+                                    60    ch2ab(36,  ang-90)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 1, 1],
+                          sigma = 7))
+
+    push!(cmapdef, "C09" => cmapdef["C9"])
+ 
+    # Circle at lightness 67  - sort of ok but a bit flouro
+    chr = 40
+    ang = 124
+
+    push!(cmapdef, "C10" =>
+          newcolourmapdef(desc="Cyclic isoluminant circle at lighhtness 67",
+                          attributeStr = "cyclic-isoluminant",
+                          hueStr = "mgbm",
+                          colourspace = "LAB",
+                          colpts = [67  ch2ab(chr,  ang-90)
+                                    67  ch2ab(chr,  ang)
+                                    67  ch2ab(chr,  ang+90)
+                                    67  ch2ab(chr,  ang+180)
+                                    67  ch2ab(chr,  ang-90)],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 1, 1],
+                          sigma = 0))
+
+    # Variation of C1. Perceptually this is good. Excellent balance of
+    # colours in the quadrants but the colour mix is not to my taste.
+    # Don't like the green.  The red-green transition clashes
+    blu = [35  70 -100]
+
+    push!(cmapdef, "C11" =>
+          newcolourmapdef(desc="Cyclic blue-green-red-magenta-blue colour map",
+                          attributeStr = "cyclic",
+                          hueStr = "bgrmb",
+                          colourspace = "LAB",
+                          colpts = [blu
+                                    70 -70 64
+                                    35 65 50
+                                    70 75 -46
+                                    blu        ],
+                          splineorder = 2,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 7))
 
 
     #-----------------------------------------------------------------------------
