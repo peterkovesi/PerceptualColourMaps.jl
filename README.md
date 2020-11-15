@@ -247,7 +247,7 @@ or "R2") have minimal badness though they do have localised perceptual
 flat spots at yellow and red. `cmap("R3")` is a useful diverging rainbow
 colour map.
 
-![Cyclic Colour Map](doc/c_cyclic_mygbm_30-95_c78_n256.png)
+![Cyclic Colour Map](doc/c_cyclic_rygcbmr_50-90_c64_n256.png)
 
 **Cyclic** colour maps have colours that are matched at each end. They
 are intended for the presentation of data that is cyclic such as
