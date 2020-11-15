@@ -249,13 +249,13 @@ colour map.
 
 ![Cyclic Colour Map](doc/c_cyclic_rygcbmr_50-90_c64_n256.png)
 
-**Cyclic** colour maps have colours that are matched at each end. They
-are intended for the presentation of data that is cyclic such as
-orientation values or angular phase data. They require particular care
-in their design (the standard colour circle is not a good map). `cmap()`
-provides cyclic maps that partition the circle into four colours,
-suitable for visualising orientation data (try `cmap("C1")`), and into
-two colours for visualising phase data (try `cmap("C4")`).
+**Cyclic** colour maps have colours that are matched at each end. They are
+intended for the presentation of data that is cyclic such as orientation values
+or angular phase data. They require particular care in their design (the
+standard colour circle is not a good map). `cmap()` provides cyclic maps that
+partition the circle into four colours, suitable for visualising orientation
+data (try `cmap("C2")` or `cmap("C7")`), two colours for visualising
+phase data (try `cmap("C4")`), and six colours (`cmap("C6")`).
 
 ![Isoluminant Colour Map](doc/isoluminant_cgo_80_c38_n256.png)
 
