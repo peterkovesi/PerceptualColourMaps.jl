@@ -1,6 +1,6 @@
 #=----------------------------------------------------------------------------
 
-Copyright (c) 2015-2018 Peter Kovesi
+Copyright (c) 2015-2020 Peter Kovesi
 peterkovesi.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -85,7 +85,7 @@ Arguments for Usage 1 and 2:
                 for.  Type 'cmap()' with no arguments to get a full list of
                 possible colour maps and their corresponding labels.
 
-  labels:  "L1" - "L19"  for linear maps
+  labels:  "L1" - "L20"  for linear maps
            "D1" - "D13"  for diverging maps
            "C1" - "C11"  for cyclic maps
            "R1" - "R4"   for rainbow maps
@@ -301,6 +301,7 @@ function cmap()
     November 2016 - Compatibility with 0.5, Mods to heat colour map
     June     2018 - Updated and added some colour maps
     November 2020 - Added C10, C11, slight tweak to L16, 2-digit naming allowed for.
+    December 2020 - Added L20, 'Gouldian'
 
     ----------------------------------------------------------------------------=#
     cmap("all")    # List all colour maps available
@@ -727,6 +728,29 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                           sigma = 0))
 
 
+    # A map inspired by MATLAB's Parula but with a smoother path that does not
+    # attempt to include cyan and maintains a more uniform slope upwards in LAB
+    # space.  It also starts at a dark grey with a lightness of 20. It works very
+    # much better than Parula!
+    push!(cmapdef, "L20" =>
+          newcolourmapdef(desc = "Black-Blue-Green-Orange-Yellow map",
+                          attributeStr = "linear",
+                          hueStr = "kbgoy",
+                          colourspace = "LAB",
+                          colpts = [20 0  0
+                                    40 55 -90 
+                                    55 -47 0 
+                                    70 -20 70
+                                    80  20 80
+                                    95 -21 92],
+                          splineorder = 3,
+                          formula = "CIE76",
+                          W = [1, 0, 0],
+                          sigma = 0))
+
+    push!(cmapdef, "GOULDIAN" => cmapdef["L20"])
+    
+
     #--------------------------------------------------------------------------------
     ## Diverging colour maps
 
@@ -1131,9 +1155,6 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                        sigma = 7))                        
 
     push!(cmapdef, "C06" => cmapdef["C6"])
-
-
-
 
     # Zig-Zag Yellow - Magenta - Cyan - Green - Yellow.
     # Colours are well balanced over the quadrants, my new favourite.
