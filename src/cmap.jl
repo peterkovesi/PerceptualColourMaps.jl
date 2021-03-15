@@ -1983,7 +1983,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     # If specified apply a cyclic shift to the colour map
     if shift != 0
         if !occursin("cyclic", lowercase(CM.attributeStr))
-            warn("Colour map shifting being applied to a non-cyclic map")
+            @warn "Colour map shifting being applied to a non-cyclic map"
         end
         map = circshift(map, round(Int, N*shift))
     end
@@ -2224,7 +2224,7 @@ function equalisecolourmap(rgblab::AbstractString, cmap::AbstractMatrix{Float64}
     N = size(cmap,1)   # No of colour map entries
 
     if N/sigma < 25
-        warn("It is not recommended that sigma be larger than 1/25 of the colour map length")
+        @warn "It is not recommended that sigma be larger than 1/25 of the colour map length"
     end
 
     rgblab = uppercase(rgblab)
@@ -2789,7 +2789,7 @@ end
 #-------------------------------------------------------------------
 # Convert N array of ColorTypes.RGB{Float64} to Nx3 Float64 array
 
-function RGB2FloatArray(rgbmap::Array{ColorTypes.RGBA{Float64},1})
+function RGB2FloatArray(rgbmap::Array{ColorTypes.RGB{Float64},1})
 
     N = length(rgbmap)
 
