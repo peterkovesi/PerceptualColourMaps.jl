@@ -3,7 +3,7 @@ PerceptualColourMaps
 
 # (Perceptual Color Maps)
 
-[![Build status (Github Actions)](https://github.com/peterkovesi.com/PerceptualColourMaps.jl/workflows/CI/badge.svg)](https://github.com/peterkovesi/PerceptualColourMaps.jl/actions)
+[![Build status (Github Actions)](https://github.com/peterkovesi/PerceptualColourMaps.jl/workflows/CI/badge.svg)](https://github.com/peterkovesi/PerceptualColourMaps.jl/actions)
 [![codecov](https://codecov.io/gh/peterkovesi/PerceptualColourMaps.jl/branch/master/graph/badge.svg?token=2vvANOTabj)](https://codecov.io/gh/peterkovesi/PerceptualColourMaps.jl)
 --------------------------------------------  
 
