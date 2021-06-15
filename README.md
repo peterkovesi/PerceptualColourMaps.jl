@@ -3,8 +3,8 @@ PerceptualColourMaps
 
 # (Perceptual Color Maps)
 
-[![Build Status](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl.svg?branch=master)](https://travis-ci.org/peterkovesi/PerceptualColourMaps.jl)
-
+[![Build status (Github Actions)](https://github.com/peterkovesi.com/PerceptualColourMaps.jl/workflows/CI/badge.svg)](https://github.com/peterkovesi/PerceptualColourMaps.jl/actions)
+[![codecov](https://codecov.io/gh/peterkovesi/PerceptualColourMaps.jl/branch/master/graph/badge.svg?token=2vvANOTabj)](https://codecov.io/gh/peterkovesi/PerceptualColourMaps.jl)
 --------------------------------------------  
 
 ![banner image](doc/banner.png)
@@ -77,7 +77,7 @@ of constant magnitude.
 
 `cmap()` is the main function you will use.  It provides a library of
 perceptually uniform colour maps.  For a full description of all the
-functions in the package, see the [Function reference](doc/index.md).
+functions in the package, see the [Documentation](doc/index.md).
 
 
 ```
@@ -285,12 +285,13 @@ or otherwise, of these maps.
 
 
 ## Links
-* [Function reference](doc/index.md)
-* [MATLAB code](http://www.peterkovesi.com/matlabfns/index.html#colour)
+* [Documentation](doc/index.md)
+* [colorcet.com](https://colorcet.com/) Home page for this project.
+  * [User Guide](https://colorcet.com/userguide/index.html)
+  * [Gallery](https://colorcet.com/gallery.html)
+  * [Colour Map files in standard formats](https://colorcet.com/download/index.html)
+* [MATLAB code](https://www.peterkovesi.com/matlabfns/index.html#colour)
 from which this Julia code was ported.
-* [A set of perceptually uniform colour map
-  files](http://peterkovesi.com/projects/colourmaps/index.html)
-  prepared for use with a number of standard visualisation packages.
 * Reference: Peter Kovesi. Good Colour Maps: How to Design Them.
   [arXiv:1509.03700 [cs.GR] 2015](https://arxiv.org/abs/1509.03700)
 * [Conference presentation](https://peterkovesi.com/papers/ColourMapsForColourBlindIAMG2017.pdf) describing the design of colour maps for the colour blind.
