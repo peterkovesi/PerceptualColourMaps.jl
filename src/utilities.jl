@@ -265,7 +265,7 @@ function gaussfilt1d(s::Array, sigma::Real)
     fw = 2*r + 1
 
     # Construct filter
-    f = Float64[exp(-x.^2/(2*sigma)) for x = -r:r]
+    f = [exp(-x.^2/(2*sigma^2)) for x = -r:r]
     f = f/sum(f)
 
     sm = zeros(size(s))

@@ -38,7 +38,7 @@ a = zeros(20,1)
 a[10] = 1
 sigma = 2
 sa = gaussfilt1d(a, sigma)
-@test abs(sa[10] - 0.282) < 1e-3
+@test abs(sa[10] - 1/(sigma*sqrt(2pi))) < 1e-3
 @test abs(sum(sa) - 1) < 1e-3
 
 # interp1

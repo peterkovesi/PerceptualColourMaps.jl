@@ -376,7 +376,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     1.0  0.85 0.0
                                     1.0  1.0  0.15
                                     1.0  1.0  1.0 ],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -394,7 +394,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     0.85 0.0  0.0
                                     1.0  0.15 0.0
                                     1.0  1.0  0.0 ],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0.0))
@@ -417,7 +417,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                      75 -71 71
                                      85 -79 79
                                      95 -38 90] ,
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0.0))
@@ -439,7 +439,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                      75 -22 -37
                                      85 -38 -20
                                      95 -25 -3],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -461,7 +461,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                      75 56 -36
                                      85 32 -22
                                      95 10 -7],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -482,7 +482,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     70 ch2ab(65, 60)
                                     80 ch2ab(75, 80)
                                     95 ch2ab(80, 105)],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -503,7 +503,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     85 -10  85
                                     95 -15  70
                                     98   0   0],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -524,7 +524,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     75 ch2ab(45, 85)
                                     80 ch2ab(22, 90)
                                     85 0 0   ],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -543,7 +543,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     80 ch2ab(45, 85)
                                     85 ch2ab(22, 90)
                                     90 0 0   ],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -561,7 +561,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     70 ch2ab(25, -95)
                                     60 ch2ab(25, -95)
                                     50 ch2ab(35, -95) ],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -637,7 +637,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                      85 -10  85
                                      95 -15  70
                                      98   0   0],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 0, 0],
                           sigma = 0))
@@ -1194,7 +1194,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     70    ch2ab(42,  ang+90)
                                     50    ch2ab(82,  ang+180)
                                     70    ch2ab(42,  ang-90)],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 0))
@@ -1217,7 +1217,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     60    ch2ab(36,  ang+90)
                                     25    ch2ab(90,  ang+180)
                                     60    ch2ab(36,  ang-90)],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 7))
@@ -1225,7 +1225,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
     push!(cmapdef, "C09" => cmapdef["C9"])
  
     # Circle at lightness 67  - sort of ok but a bit flouro
-    chr = 40
+    chr = 42
     ang = 124
 
     push!(cmapdef, "C10" =>
@@ -1238,7 +1238,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     67  ch2ab(chr,  ang+90)
                                     67  ch2ab(chr,  ang+180)
                                     67  ch2ab(chr,  ang-90)],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 0))
@@ -1371,7 +1371,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     70 ch2ab(50, 160)
                                     70 ch2ab(50,  90)
                                     70 ch2ab(50,  45)],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 0))
@@ -1389,7 +1389,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     80 ch2ab(50, 160)
                                     80 ch2ab(50,  90)
                                     80 ch2ab(46,  55)],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 0))
@@ -1405,7 +1405,7 @@ function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
                                     70 ch2ab(40, -80)
                                     70 ch2ab(40, -40)
                                     70 ch2ab(50,  0)],
-                          splineorder = 2,
+                          splineorder = 3,
                           formula = "CIE76",
                           W = [1, 1, 1],
                           sigma = 0))
@@ -2296,10 +2296,10 @@ function equalisecolourmap(rgblab::AbstractString, cmap::AbstractMatrix{Float64}
         Li = interpolate(L, BSpline(Linear()))
         L = [Li(v) for v in newN]
 
-        ai = interpolate(a, BSpline(Constant()))
+        ai = interpolate(a, BSpline(Linear()))
         a = [ai(v) for v in newN]
 
-        bi = interpolate(b, BSpline(Constant()))
+        bi = interpolate(b, BSpline(Linear()))
         b = [bi(v) for v in newN]
 
         # Record initial colour differences for evaluation at the end
