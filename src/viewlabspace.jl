@@ -14,163 +14,77 @@ The Software is provided "as is", without warranty of any kind.
 
 ----------------------------------------------------------------------------=#
 
-using PyPlot
 export viewlabspace
 
 """
-viewlabspace:  Visualisation of L*a*b* space
+    viewlabspace(L=50)
 
-```
-Usage:    viewlabspace(L = 50, figNo = 1)
+Return a CairoMakie figure showing the a*–b* slice of CIELAB colour space at
+lightness `L` (0–100). Colours outside the RGB gamut are shown in black;
+reference colours and their Lab coordinates are labelled.
 
-Arguments:     L - Lightness level in which to display slice of L*a*b* space
-           figNo - PyPlot figure to use
-```
-Function allows interactive viewing of a sequence of images corresponding to
-different slices of lightness in L*a*b* space.  Lightness varies from 0 to
-100.  Initially a slice at a lightness of 50 is displayed.
-Pressing 'l' or arrow up/right will increase the lightness by dL.
-Pressing 'd' or arrow down/left will darken by dL.
-Press 'x' to exit.
+The figure can be displayed with `display(fig)` or saved with
+`CairoMakie.save("labslice.png", fig)`. Call the function again for another
+lightness; it does not wait for terminal input.
 
-To Do:
-The CIELAB colour coordinates of the cursor position within the slice images
-should be updated continuously.  This is useful for determining suitable control
-points for the definition of colourmap paths through CIELAB space in cmap().
+The old `viewlabspace(L, figNo)` form is deprecated. Figure numbers are no
+longer used; each call returns a new figure.
 
-See also: colourmappath, cmap
+See also: cmap
 """
-function viewlabspace(L=50, figNo=1)
-    # March 2013
-    # November 2013  Interactive CIELAB coordinate feedback from mouse position
-    # December 2015  Ported from MATLAB to Julia but loses interactivity...
+function viewlabspace(L::Real=50)
+    isfinite(L) && 0 <= L <= 100 || throw(ArgumentError("Lightness must be between 0 and 100"))
+    coords = -127:0.5:127
+    pixels = labslice(L, coords)
+    reference = srgb2lab([1.0 0 0; 0 1 0; 0 0 1; 1 1 0; 0 1 1; 1 0 1])
+    names = ("red", "green", "blue", "yellow", "cyan", "magenta")
 
-    # Define some reference colours in rgb
-    rgb = [1 0 0
-           0 1 0
-           0 0 1
-           1 1 0
-           0 1 1
-           1 0 1]
-
-    colours = ["red    "
-               "green  "
-               "blue   "
-               "yellow "
-               "cyan   "
-               "magenta"]
-
-    # ... and convert them to lab
-    labv = srgb2lab(rgb)
-
-    # Obtain cylindrical coordinates in lab space
-    labradius = sqrt(labv[:,2].^2+labv[:,3].^2)
-    labtheta = atan(labv[:,3], labv[:,2])
-
-    # Define a*b* grid for image
-    scale = 2;
-    (a, b) = meshgrid(-127:1/scale:127)
-    (rows,cols) = size(a)
-
-    # Scale and offset lab coords to fit image coords
-    labc = zeros(size(labv))
-    labc[:,1] = round(labv[:,1])
-    labc[:,2] = round(scale*labv[:,2] + cols/2)
-    labc[:,3] = round(scale*labv[:,3] + rows/2)
-
-    # Print out lab values
-    labv = round(labv)
-    @printf("\nCoordinates of standard colours in L*a*b* space\n\n");
-    for n = 1:length(colours)
-        @printf("%s  L%3d   a %4d  b %4d    angle %4.1f  radius %4d\n",
-                colours[n], labv[n,1], labv[n,2], labv[n,3],
-                labtheta[n], round(labradius[n]))
+    fig = CairoMakie.Figure(size=(850, 800))
+    ax = CairoMakie.Axis(fig[1, 1]; xlabel="a*", ylabel="b*",
+        title=@sprintf("Lab space: Lightness %.1f", L), aspect=CairoMakie.DataAspect(),
+        xticks=-100:50:100, yticks=-100:50:100)
+    # Makie indexes images by x then y, so a* increases rightwards and b* upwards.
+    bounds = (first(coords) - step(coords)/2, last(coords) + step(coords)/2)
+    CairoMakie.image!(ax, bounds, bounds, pixels; interpolate=false)
+    CairoMakie.scatter!(ax, [0.0], [0.0]; marker=:+, color=:red, markersize=16)
+    for (i, name) in enumerate(names)
+        a, b = reference[i, 2], reference[i, 3]
+        CairoMakie.scatter!(ax, [a], [b]; marker=:+, color=:white, markersize=16)
+        # Put labels to the left near the right edge of the slice.
+        rightedge = a > 60
+        CairoMakie.text!(ax, a, b;
+            text=@sprintf("%s\n%.0f %.0f %.0f", name, reference[i, 1], a, b),
+            color=:white, fontsize=14, strokecolor=:black, strokewidth=0.5,
+            align=(rightedge ? :right : :left, :center),
+            offset=(rightedge ? -10 : 10, 0))
     end
-
-    @printf("\n\n")
-
-    # Generate axis tick values
-    tickval = [-100, -50, 0, 50, 100]
-    tickcoords = scale*tickval + cols/2
-    ticklabels = ("-100", "-50", "0", "50", "100")
-
-
-    renderlabslice(L, a, b, figNo, labv, labc, colours)
-
-    @printf("Type in a desired Lightness value or type 'x' to exit\n\n")
-    resp = ""
-    while lowercase(resp) != 'x'
-        resp = lowercase(readline())
-
-        if resp[1] == 'x'
-            break
-        else
-            try
-                L = parse(Float64, resp)
-                renderlabslice(L, a, b, figNo, labv, labc, colours)
-            catch
-                @printf("Type in a desired Lightness value or type 'x' to exit\n")
-            end
-        end
-    end
-
+    CairoMakie.xlims!(ax, bounds...)
+    CairoMakie.ylims!(ax, bounds...)
+    return fig
 end
 
-#--------------------------------------------------------
+function viewlabspace(L::Real, figNo::Integer)
+    Base.depwarn("viewlabspace(L, figNo) is deprecated; call viewlabspace(L) and use the returned figure.",
+                 :viewlabspace)
+    return viewlabspace(L)
+end
 
-function renderlabslice(L, a, b, figNo, labv, labc, colours)
-
-    # Build image in lab space
-    (rows,cols) = size(a)
-
-    lab = zeros(rows,cols,3)
-    lab[:,:,1] = L
-    lab[:,:,2] = a
-    lab[:,:,3] = b
-
-    # Generate rgb values from lab
+# Generate an image in Makie's (a*, b*) order. Preserve the existing round-trip
+# Lab tolerance of 2 when masking colours outside the displayable RGB gamut.
+function labslice(L, coords)
+    lab = Array{Float64}(undef, length(coords), length(coords), 3)
+    for j in eachindex(coords), i in eachindex(coords)
+        lab[i, j, 1] = L
+        lab[i, j, 2] = coords[i]
+        lab[i, j, 3] = coords[j]
+    end
     rgb = lab2srgb(lab)
-
-    # Invert to reconstruct the lab values
-    lab2 = srgb2lab(rgb)
-
-    # Where the reconstructed lab values differ from the specified values is
-    # an indication that we have gone outside of the rgb gamut.  Apply a
-    # mask to the rgb values accordingly
-    mask = squeeze(maximum(abs(lab-lab2),3),3)
-
-    for n = 1:3
-        rgb[:,:,n] = rgb[:,:,n].*(mask.<2)  # tolerance of 2
+    reconstructed = srgb2lab(rgb)
+    pixels = ColorTypes.RGB.(rgb[:, :, 1], rgb[:, :, 2], rgb[:, :, 3])
+    for j in axes(pixels, 2), i in axes(pixels, 1)
+        if maximum(abs(lab[i, j, c] - reconstructed[i, j, c]) for c in 1:3) >= 2
+            pixels[i, j] = ColorTypes.RGB(0, 0, 0)
+        end
     end
-
-    figure(figNo)
-    imshow(rgb, origin="lower", aspect="equal")
-    title(@sprintf("Lab space:  Lightness %d", L))
-
-    # Generate axis tick values
-    tickval = [-100, -50, 0, 50, 100]
-    scale = 2
-    tickcoords = scale*tickval + cols/2
-    ticklabels = ("-100", "-50", "0", "50", "100")
-    xticks(tickcoords, ticklabels)
-    yticks(tickcoords, ticklabels)
-
-    xlabel("a*")
-    ylabel("b*")
-
-    hold(true),
-    plot(cols/2, rows/2, "r+")   # Centre point for reference
-
-    # Plot reference colour positions
-    for n = 1:length(colours)
-        plot(labc[n,2], labc[n,3], "w+")
-        text(labc[n,2], labc[n,3],
-             @sprintf("   %s\n  %d %d %d  ",colours[n],
-                     labv[n,1], labv[n,2], labv[n,3]),
-             color = [1, 1, 1])
-
-    end
-
-    hold(false)
-
+    return pixels
 end

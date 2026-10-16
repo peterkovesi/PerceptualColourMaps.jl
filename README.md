@@ -11,6 +11,9 @@ PerceptualColourMaps
 
 ## Installation
 
+Requires Julia 1.10 or later. CairoMakie is installed with the package and
+provides the standard design diagnostics; Python is not required.
+
 Install via the package manager.
 
 ```
@@ -117,7 +120,8 @@ Arguments for Usage 1 and 2:
                     to be cyclically rotated, may be negative.  (Should only be
                     applied to cyclic colour maps!). Defaults to 0.
     reverse::Bool - If true reverses the colour map. Defaults to false.
-diagnostics::Bool - If true displays various diagnostic plots. Note the
+     diagnostics - False (default), true to display CairoMakie diagnostic
+                    plots, or a function called with each figure. Note the
                     diagnostic plots will be for the map _before_ any cyclic
                     shifting or reversing is applied. Defaults to false.
  returnname::Bool - If true the function returns a tuple of the colourmap, its
@@ -150,66 +154,60 @@ be created in order to determine its full name.
 
 **Using the colour maps:**
 
-PyPlot:
+CairoMakie is included as a standard dependency. For example:
 
-```
-> using PyPlot
-> sr = sineramp();    # Generate the sineramp() colour map test image.
-> imshow(sr);         # Display with matplotlib's default 'jet' colour map.
-                      # Note the perceptual dead spots in the map.
-> imshow(sr, cmap = ColorMap(cmap("L3"))); # Apply the cmap() heat colour map.
+```julia
+using PerceptualColourMaps, CairoMakie
+sr = sineramp()
+heatmap(permutedims(sr); colormap=cmap("L3"), axis=(yreversed=true,))
 ```
 
-Plots:
+For diverging or cyclic data, apply the map first to honour its centre or cycle:
 
-```
-> using Plots
-> y=rand(100);
-> Plots.scatter(y, zcolor=y, marker=ColorGradient(cmap("R3")));
-```
-
-Winston:
-
-```
-> Using Winston
-> colormap(cmap("R1"));    # Set Winston's colour map to the cmap() rainbow
-                           # colour map first.
-> imagesc(sr);             # Then display the image
+```julia
+rgbimg = applydivergingcolourmap(sr, cmap("D1"), 127)
+# applycolourmap and its variants return a row × column × RGB array.
+pixels = RGB.(rgbimg[:, :, 1], rgbimg[:, :, 2], rgbimg[:, :, 3])
+image(permutedims(pixels); axis=(yreversed=true, aspect=DataAspect()))
 ```
 
-You can also apply a colour map to a single channel image to create a
-conventional RGB image. This is recommended if you are using a
-diverging or cyclic colour map because it allows you to ensure data
-values are honoured appropriately when you map them to colours.
+**Design diagnostics:**
 
-```
-  Apply the L4 heat colour map to the test image
-> rgbimg = applycolourmap(sr, cmap("L4")[1]);
+`cmap("L3", diagnostics=true)` displays three CairoMakie figures: the original
+and equalised sine ramps, cumulative and local colour differences, and the
+RGB/Lab components and gamut-clipping errors. The diagnostics describe the map
+before cyclic shifting or reversing. Corrected colour differences refer to the
+designed Lab path; the gamut-error panel separately shows the effect of conversion
+to displayable RGB.
 
-  Apply a diverging colour map to the test image using 127 as the
-  value that is associated with the centre point of the diverging
-  colour map
-> rgbimg = applydivergingcolourmap(sr, cmap("D1")[1],127);
+To save or customise the figures, pass a function instead of `true`. It is called
+once per figure, in the order above, without automatic display. The returned
+colour map (including `returnname=true`) is unchanged:
 
-  Apply a cyclic colour map to the circlesineramp() test image specifying
-  a data cyclelength of 2*pi.
-> (cr,) = circlesineramp();   # Generate a cyclic colour map test image.
-> rgbimg = applycycliccolourmap(cr, cmap("C1")[1], cyclelength=2*pi);
-
-> ImageView.view(rgbimg)      # Display the image with ImageView
-> PyPlot.imshow(rgbimg)       # or with PyPlot
-```
-*Warning* PyPlot and Tk do not seem to coexist very well (Julia can
-crash!).  ImageView and Winston use Tk which means that you may have
-to take care which image display functions you choose to use.
-
-These colour maps can also be passed to the `Plots.ColorGradient` constructor.
-Here's an example using the 'Rainbow 3' diverging colour map for a scatter plot.
-```
-> Using Plots
-> y=rand(100); scatter(y, zcolor=y, marker=ColorGradient(cmap("R3")[1]))
+```julia
+figures = Figure[]
+colors = cmap("L3", diagnostics=fig -> push!(figures, fig))
+for (i, fig) in enumerate(figures)
+    save("diagnostic-$(i).png", fig)
+end
+save("diagnostic-contrast.svg", figures[2])
 ```
 
+`equalisecolourmap` and `equalizecolormap` accept the same boolean or function
+as their final positional `diagnostics` argument, after `cyclic`.
+CairoMakie produces static figures for notebooks, plot panes, and file export;
+it does not provide an interactive desktop window.
+
+To inspect a slice of Lab colour space without waiting for terminal input:
+
+```julia
+fig = viewlabspace(50)
+save("lab-L50.png", fig)
+```
+
+`viewlabspace` now returns a new static figure on each call. The old second
+`figNo` argument is deprecated and ignored; call it again with another lightness
+instead of entering lightness values at a terminal prompt.
 
 ## Organisation of the Colour Maps
 

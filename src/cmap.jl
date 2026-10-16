@@ -19,13 +19,9 @@ export lab2srgb, srgb2lab, RGBA2UInt32
 export RGB2FloatArray, RGBA2FloatArray
 export FloatArray2RGB, FloatArray2RGBA
 
-import Images, PyPlot
+import Images
 import Images.ColorTypes, Images.Colors
 using Interpolations
-
-# There seems to be a fatal clash between PyPlot and Tk.  ImageView
-# and Winston use Tk so unfortunately they have been excluded and all
-# graphics done via PyPlot
 
 #----------------------------------------------------------------------------
 
@@ -118,7 +114,8 @@ Arguments for Usage 1 and 2:
                     to be cyclically rotated, may be negative.  (Should only be
                     applied to cyclic colour maps!). Defaults to 0.
     reverse::Bool - If true reverses the colour map. Defaults to false.
-diagnostics::Bool - If true displays various diagnostic plots. Note the
+     diagnostics - False (default), true to display CairoMakie diagnostic
+                    plots, or a function called with each figure. Note the
                     diagnostic plots will be for the map _before_ any cyclic
                     shifting or reversing is applied. Defaults to false.
  returnname::Bool - If true the function returns a tuple of the colourmap, its
@@ -151,48 +148,49 @@ be created in order to determine its full name.
 
 **Using the colour maps:**
 
-PyPlot:
-```
-> using PyPlot
-> sr = sineramp();    # Generate the sineramp() colour map test image.
-> imshow(sr);         # Display with matplotlib's default 'jet' colour map.
-                      # Note the perceptual dead spots in the map.
-> imshow(sr, cmap = ColorMap(cmap("L3"))); # Apply the cmap() heat colour map.
-```
+CairoMakie is included as a standard dependency. For example:
 
-Plots:
-```
-> using Plots
-> y=rand(100);
-> Plots.scatter(y, zcolor=y, marker=ColorGradient(cmap("R3")));
+```julia
+using PerceptualColourMaps, CairoMakie
+sr = sineramp()
+heatmap(permutedims(sr); colormap=cmap("L3"), axis=(yreversed=true,))
 ```
 
-You can also apply a colour map to a single channel image to create a
-conventional RGB image. This is recommended if you are using a
-diverging or cyclic colour map because it allows you to ensure data
-values are honoured appropriately when you map them to colours.
+For diverging or cyclic data, apply the map first to honour its centre or cycle:
 
+```julia
+rgbimg = applydivergingcolourmap(sr, cmap("D1"), 127)
+# applycolourmap and its variants return a row × column × RGB array.
+pixels = RGB.(rgbimg[:, :, 1], rgbimg[:, :, 2], rgbimg[:, :, 3])
+image(permutedims(pixels); axis=(yreversed=true, aspect=DataAspect()))
 ```
-  Apply the L4 heat colour map to the test image
-> rgbimg = applycolourmap(sr, cmap("L4"));
 
-  Apply a diverging colour map to the test image using 127 as the
-  value that is associated with the centre point of the diverging
-  colour map
-> rgbimg = applydivergingcolourmap(sr, cmap("D1"),127);
+**Design diagnostics:**
 
-  Apply a cyclic colour map to the circlesineramp() test image specifying
-  a data cyclelength of 2*pi.
-> (cr,) = circlesineramp();   # Generate a cyclic colour map test image.
-> rgbimg = applycycliccolourmap(cr, cmap("C1"), cyclelength=2*pi);
+`cmap("L3", diagnostics=true)` displays three CairoMakie figures: the original
+and equalised sine ramps, cumulative and local colour differences, and the
+RGB/Lab components and gamut-clipping errors. The diagnostics describe the map
+before cyclic shifting or reversing. Corrected colour differences refer to the
+designed Lab path; the gamut-error panel separately shows the effect of conversion
+to displayable RGB.
 
-> ImageView.view(rgbimg)      # Display the image with ImageView
-> PyPlot.imshow(rgbimg)       # or with PyPlot
+To save or customise the figures, pass a function instead of `true`. It is called
+once per figure, in the order above, without automatic display. The returned
+colour map (including `returnname=true`) is unchanged:
+
+```julia
+figures = Figure[]
+colors = cmap("L3", diagnostics=fig -> push!(figures, fig))
+for (i, fig) in enumerate(figures)
+    save("diagnostic-\$(i).png", fig)
+end
+save("diagnostic-contrast.svg", figures[2])
 ```
-*Warning* PyPlot and Tk do not seem to coexist very well (Julia can
-crash!).  ImageView and Winston use Tk which means that you may have
-to take care which image display functions you choose to use.
 
+`equalisecolourmap` and `equalizecolormap` accept the same boolean or function
+as their final positional `diagnostics` argument, after `cyclic`.
+CairoMakie produces static figures for notebooks, plot panes, and file export;
+it does not provide an interactive desktop window.
 
 **Colour Map naming convention:**
 
@@ -308,7 +306,7 @@ function cmap()
 end
 
 function cmap(I::AbstractString; N::Int=256, chromaK::Real=1, shift::Real = 0,
-              reverse::Bool = false, diagnostics::Bool = false, returnname::Bool = false)
+              reverse::Bool = false, diagnostics::Union{Bool,Function} = false, returnname::Bool = false)
 
 
     # Definitions of key angles in Lab space for defining colours in colour
@@ -2108,7 +2106,7 @@ equalise the perceptual contrast of colour maps obtained from some
 other source.
 
 ```
-Usage: newrgbmap = equalisecolourmap(rgblab, map, formula, W, sigma, diagnostics)
+Usage: newrgbmap = equalisecolourmap(rgblab, map, formula, W, sigma, cyclic, diagnostics)
                    equalizecolormap(....
 
 Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
@@ -2127,8 +2125,8 @@ Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
                cyclic - Boolean flag indicating whether the colour map is
                         cyclic. This affects how smoothing is applied at
                         the end points.
-          diagnostics - Optional boolean flag indicating whether diagnostic
-                        plots should be displayed.  Defaults to false.
+          diagnostics - False (default), true to display diagnostic figures,
+                        or a function called once with each CairoMakie figure.
 
 Returns:    newrgbmap - RGB colour map adjusted so that the perceptual
                         contrast of colours along the colour map is constant.
@@ -2218,7 +2216,7 @@ sineramp, circlesineramp
 """
 function equalisecolourmap(rgblab::AbstractString, cmap::AbstractMatrix{Float64},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
-                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Union{Bool,Function} = false)
    # October  2015  - Ported from MATLAB to Julia
 
     N = size(cmap,1)   # No of colour map entries
@@ -2325,77 +2323,16 @@ function equalisecolourmap(rgblab::AbstractString, cmap::AbstractMatrix{Float64}
     newlabmap = [L a b]
     newrgbmap = lab2srgb(newlabmap)
 
-    if diagnostics
+    if diagnostics !== false
+        # Preserve the diagnostic contrast of the designed Lab path, before
+        # conversion to displayable RGB (the gamut error is plotted separately).
+        newdeltaE = formula == "CIE76" ? cie76(L, a, b, W) : ciede2000(L, a, b, W)
+        figures = diagnosticfigures(rgbmap, newrgbmap, newlabmap,
+                                    initialcumdE, initialdeltaE, newdeltaE, formula, W)
+        showfigure = diagnostics === true ? (fig -> display(fig; backend=CairoMakie)) : diagnostics
+        foreach(showfigure, figures)
+    end
 
-        # Compute actual perceptual contrast values achieved
-        if formula == "CIE76"
-            newdeltaE = cie76(L, a, b, W)
-        elseif formula == "CIEDE2000"
-            newdeltaE = ciede2000(L, a, b, W)
-        else
-            error("Unknown colour difference formula")
-        end
-
-        sr = sineramp()
-
-        PyPlot.figure(1); PyPlot.clf()
-        PyPlot.subplot(2,1,1)
-        PyPlot.imshow(applycolourmap(sr, rgbmap))    # Unequalised colour map
-        PyPlot.axis("off");  PyPlot.axis("tight")
-        PyPlot.title("Unequalised colour map")
-
-        PyPlot.subplot(2,1,2)
-        PyPlot.imshow(applycolourmap(sr, newrgbmap)) # Equalised colour map
-        PyPlot.axis("off");  PyPlot.axis("tight")
-        PyPlot.title("Equalised colour map")
-
-        PyPlot.figure(2); PyPlot.clf()
-        PyPlot.subplot(2,1,1)
-        PyPlot.plot(collect(1:N), initialcumdE)
-        PyPlot.axis([1, N, 0, 1.05*maximum(initialcumdE)])
-        PyPlot.xlabel("Colour map index")
-        PyPlot.title(@sprintf("Cumulative change in %s with weights [%.1f  %.1f  %.1f] of input colour map",
-                   formula, W[1], W[2], W[3]))
-
-        PyPlot.subplot(2,1,2)
-        PyPlot.plot(1:N, initialdeltaE, 1:N, newdeltaE)
-        PyPlot.axis([1, N, 0, 1.05*maximum(initialdeltaE)])
-        PyPlot.legend(["Original colour map",
-               "Adjusted colour map"], "upper left");
-        PyPlot.title(@sprintf("Magnitude of raw and corrected %s differences along colour map", formula))
-        PyPlot.xlabel("Colour map index")
-        PyPlot.ylabel("dE")
-
-        # Convert newmap back to Lab to check for gamut clipping
-        labmap = srgb2lab(newrgbmap)
-        PyPlot.figure(3); PyPlot.clf()
-        PyPlot.subplot(3,1,3)
-        PyPlot.plot(1:N, L-labmap[:,1],
-             1:N, a-labmap[:,2],
-             1:N, b-labmap[:,3])
-        PyPlot.legend(["Lightness", "a", "b"], "upper left")
-        maxe = maximum(abs.([L-labmap[:,1]; a-labmap[:,2]; b-labmap[:,3]]))
-        PyPlot.axis([1, N, -maxe, maxe])
-        PyPlot.title("Difference between desired and achieved L a b values (gamut clipping)")
-
-        # Plot RGB values
-        PyPlot.subplot(3,1,1)
-        PyPlot.plot(1:N, newrgbmap[:,1],"r-",
-             1:N, newrgbmap[:,2],"g-",
-             1:N, newrgbmap[:,3],"b-")
-
-        PyPlot.legend(["Red", "Green", "Blue"], "upper left")
-        PyPlot.axis([1, N, 0, 1.1])
-        PyPlot.title("RGB values along colour map")
-
-        # Plot Lab values
-        PyPlot.subplot(3,1,2)
-        PyPlot.plot(1:N, L, 1:N, a, 1:N, b)
-        PyPlot.legend(["Lightness", "a", "b"], "upper left")
-        PyPlot.axis([1, N, -100, 100])
-        PyPlot.title("L a b values along colour map")
-
-    end  # of diagnostics
 
     return newrgbmap
 end
@@ -2405,7 +2342,7 @@ end
 
 function equalisecolourmap(rgblab::AbstractString, cmap::AbstractVector{ColorTypes.RGB{Float64}},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
-                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Union{Bool,Function} = false)
 
     return equalisecolourmap(rgblab, RGB2FloatArray(cmap), formula, W,
                              sigma, cyclic, diagnostics)
@@ -2416,7 +2353,7 @@ end
 
 function equalisecolourmap(rgblab::AbstractString, cmap::AbstractVector{ColorTypes.RGBA{Float64}},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
-                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Union{Bool,Function} = false)
 
     return equalisecolourmap(rgblab, RGBA2FloatArray(cmap), formula, W,
                              sigma, cyclic, diagnostics)
@@ -2428,7 +2365,7 @@ end
 equalisecolourmap - Equalise colour contrast over a colourmap
 equalizecolormap
 ```
-Usage: newrgbmap = equalisecolourmap(rgblab, map, formula, W, sigma, diagnostics)
+Usage: newrgbmap = equalisecolourmap(rgblab, map, formula, W, sigma, cyclic, diagnostics)
                    equalizecolormap(....
 
 Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
@@ -2445,8 +2382,8 @@ Arguments:     rgblab - String "RGB" or "LAB" indicating the type of data
                cyclic - Boolean flag indicating whether the colour map is
                         cyclic. This affects how smoothing is applied at
                         the end points.
-          diagnostics - Optional boolean flag indicating whether diagnostic
-                        plots should be displayed.  Defaults to false.
+          diagnostics - False (default), true to display diagnostic figures,
+                        or a function called once with each CairoMakie figure.
 
 Returns:    newrgbmap - RGB colour map adjusted so that the perceptual
                         contrast of colours along the colour map is constant.
@@ -2459,7 +2396,7 @@ See also: cmap, sineramp, circlesineramp
 """
 function equalizecolormap(rgblab::AbstractString, cmap::Array{Float64,2},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
-                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Union{Bool,Function} = false)
 
     return equalisecolourmap(rgblab, cmap, formula, W, sigma, cyclic, diagnostics)
 end
@@ -2468,7 +2405,7 @@ end
 
 function equalizecolormap(rgblab::AbstractString, cmap::Array{ColorTypes.RGB{Float64},1},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
-                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Union{Bool,Function} = false)
 
     return equalisecolourmap(rgblab, RGB2FloatArray(cmap), formula, W,
                              sigma, cyclic, diagnostics)
@@ -2479,7 +2416,7 @@ end
 
 function equalizecolormap(rgblab::AbstractString, cmap::Array{ColorTypes.RGBA{Float64},1},
                            formula::AbstractString="CIE76", W::Array=[1.0, 0.0, 0.0],
-                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Bool = false)
+                           sigma::Real = 0.0, cyclic::Bool = false, diagnostics::Union{Bool,Function} = false)
 
     return equalisecolourmap(rgblab, RGBA2FloatArray(cmap), formula, W,
                              sigma, cyclic, diagnostics)
