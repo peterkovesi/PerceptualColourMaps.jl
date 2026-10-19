@@ -1,6 +1,11 @@
 #=----------------------------------------------------------------------------
 
-Copyright (c) 2015 Peter Kovesi
+Copyright (c) 2026 Ivan Kuznetsoff
+CairoMakie implementation contributed to PerceptualColourMaps.jl.
+
+Based on the diagnostic design and original PyPlot implementation by
+Peter Kovesi, originally part of cmap.jl.
+Original implementation: Copyright (c) 2015 Peter Kovesi
 pk@peterkovesi.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
