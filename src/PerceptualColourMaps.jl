@@ -64,8 +64,10 @@ module PerceptualColourMaps
 
 using Printf, LinearAlgebra, Statistics
 using Images
+import CairoMakie
 
 include("cmap.jl")
+include("diagnostics.jl")
 include("applycolourmaps.jl")
 include("viewlabspace.jl")
 include("relief.jl")
